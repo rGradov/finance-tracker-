@@ -35,6 +35,7 @@ class Circles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
     return Consumer<PinCodeProvider>(builder: (_, provider, __) {
       return ListView.separated(
           shrinkWrap: true,
@@ -44,10 +45,11 @@ class Circles extends StatelessWidget {
             return CircleHidingNumber(idx: idx);
           },
           separatorBuilder: (_, idx) {
-            return const SizedBox(
-              width: 16,
-              height: 16,
-            );
+            if(orientation == Orientation.portrait){
+              return const SizedBox(width: 16,height: 16,);
+            } else {
+              return const SizedBox(width: 64, height: 64,);
+            }
           },
           scrollDirection: Axis.horizontal,
           itemCount: 4);
