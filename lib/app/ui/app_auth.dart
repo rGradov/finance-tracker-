@@ -1,5 +1,6 @@
 import 'package:finance_tracker/app/provider/pin_code_provider.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/app/utils/app_screen_size.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,6 +11,7 @@ class PinScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double _screenHeight = ScreenSize().screenHeight;
     return ChangeNotifierProvider(
       create: (_) => PinCodeProvider(),
       child: Scaffold(
@@ -17,11 +19,11 @@ class PinScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             /// DON'T CHANGE THIS FLEX VALUES
-            children: const [
-              Expanded(flex: 1, child: Header()),
-              Expanded(flex: 3, child: Circles()),
-              Spacer(flex: 2,),
-              Expanded(flex: 5, child: ButtonView()),
+            children: [
+              const Expanded(flex: 1, child: Header()),
+              const Expanded(flex: 3, child: PinCircles()),
+              Spacer(flex: _screenHeight < 700 ? 1 : 2,),
+              const Expanded(flex: 5, child: CustomNumberKeyboard()),
             ],
           ),
         ),
@@ -30,8 +32,8 @@ class PinScreen extends StatelessWidget {
   }
 }
 
-class Circles extends StatelessWidget {
-  const Circles({Key? key}) : super(key: key);
+class PinCircles extends StatelessWidget {
+  const PinCircles({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +42,20 @@ class Circles extends StatelessWidget {
       return ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-
           itemBuilder: (_, idx) {
             return CircleHidingNumber(idx: idx);
           },
           separatorBuilder: (_, idx) {
-            if(orientation == Orientation.portrait){
-              return const SizedBox(width: 16,height: 16,);
+            if (orientation == Orientation.portrait) {
+              return const SizedBox(
+                width: 16,
+                height: 16,
+              );
             } else {
-              return const SizedBox(width: 64, height: 64,);
+              return const SizedBox(
+                width: 64,
+                height: 64,
+              );
             }
           },
           scrollDirection: Axis.horizontal,
@@ -57,7 +64,6 @@ class Circles extends StatelessWidget {
   }
 }
 
-/// how it works?
 class CircleHidingNumber extends StatelessWidget {
   final int idx;
   const CircleHidingNumber({Key? key, required this.idx}) : super(key: key);
@@ -91,13 +97,13 @@ class Header extends StatelessWidget {
         constraints: const BoxConstraints(maxHeight: 100),
         child: Align(
           alignment: Alignment.bottomCenter,
-
           child: Text(
+            /// TODO: translate me
             "Let’s  setup your PIN",
             /// TODO: extract me
             style: TextStyle(
                 color: AppColor.baseLight[80],
-                fontFamily: 'Inter',
+                fontFamily: 'Inter',/// don't forget about me too
                 fontWeight: FontWeight.w600,
                 fontSize: 18),
           ),
@@ -132,8 +138,8 @@ class RemoveButton extends StatelessWidget {
   }
 }
 
-class Arrow extends StatelessWidget {
-  const Arrow({Key? key}) : super(key: key);
+class NextButton extends StatelessWidget {
+  const NextButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -156,10 +162,12 @@ class Arrow extends StatelessWidget {
     );
   }
 }
+/// remove button and next button very similar (by code and logic) but i doesn't
+/// wont to merge them into one Widget
 
 /// FIXME: change name
-class ButtonView extends StatelessWidget {
-  const ButtonView({Key? key}) : super(key: key);
+class CustomNumberKeyboard extends StatelessWidget {
+  const CustomNumberKeyboard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +188,7 @@ class ButtonView extends StatelessWidget {
               if (idx == 9) {
                 return const RemoveButton();
               } else if (idx == 11) {
-                return const Arrow();
+                return const NextButton();
               } else {
                 return NumberButton(number: idx == 10 ? 0 : idx + 1);
               }
@@ -188,7 +196,7 @@ class ButtonView extends StatelessWidget {
               if (idx == 10) {
                 return const NumberButton(number: 0);
               } else if (idx == 11) {
-                return const Arrow();
+                return const NextButton();
               } else if (idx == 6) {
                 return const RemoveButton();
               } else {
