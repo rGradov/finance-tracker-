@@ -16,14 +16,11 @@ class PinScreen extends StatelessWidget {
         backgroundColor: AppColor.violet[100],
         body: SafeArea(
           child: Column(
+            /// DON'T CHANGE THIS FLEX VALUES
             children: const [
-              Expanded(flex: 2, child: Header()),
-              Expanded(
-                flex: 4,
-                child: Circles(),
-              ),
-
-              /// DONT TUCH THIS FLEX VALUE
+              Expanded(flex: 1, child: Header()),
+              Expanded(flex: 3, child: Circles()),
+              Spacer(flex: 2,),
               Expanded(flex: 5, child: ButtonView()),
             ],
           ),
@@ -39,29 +36,43 @@ class Circles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<PinCodeProvider>(builder: (_, provider, __) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 40),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColor.baseLight[80]!,
-            ),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColor.baseLight[80]!,
-            ),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColor.baseLight[80]!,
-            ),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColor.baseLight[80]!,
-            ),
-          ],
+      return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+
+          itemBuilder: (_, idx) {
+            return CircleHidingNumber(idx: idx);
+          },
+          separatorBuilder: (_, idx) {
+            return const SizedBox(
+              width: 16,
+              height: 16,
+            );
+          },
+          scrollDirection: Axis.horizontal,
+          itemCount: 4);
+    });
+  }
+}
+
+/// how it works?
+class CircleHidingNumber extends StatelessWidget {
+  final int idx;
+  const CircleHidingNumber({Key? key, required this.idx}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
+      return AnimatedContainer(
+        curve: Curves.decelerate,
+        duration: const Duration(milliseconds: 300),
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: provider.pin.length <= idx
+              ? Colors.white.withOpacity(0.4)
+              : AppColor.baseLight[80],
         ),
       );
     });
@@ -77,11 +88,11 @@ class Header extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 100),
         child: Align(
-          alignment: Alignment.center,
+          alignment: Alignment.bottomCenter,
 
-          /// TODO: extract me
           child: Text(
             "Let’s  setup your PIN",
+            /// TODO: extract me
             style: TextStyle(
                 color: AppColor.baseLight[80],
                 fontFamily: 'Inter',
@@ -105,7 +116,7 @@ class RemoveButton extends StatelessWidget {
     return Consumer<PinCodeProvider>(builder: (_, provider, __) {
       return AnimatedOpacity(
         duration: const Duration(milliseconds: 300),
-        opacity: provider.getPinCode.isNotEmpty ? 1 : 0.3,
+        opacity: provider.getPin.isNotEmpty ? 1 : 0.3,
         child: InkWell(
             onTap: provider.removeValue,
             child: Transform.scale(
