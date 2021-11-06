@@ -103,62 +103,19 @@ class RemoveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<PinCodeProvider>(builder: (_, provider, __) {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 400),
-          opacity: provider.getPinCode.length > 1?1:0.3,
-          child: InkWell(
-              onTap: () {},
-              child: Transform.scale(
-                  scale: 0.8,
-                  child: SvgPicture.asset(
-                    AppIcons.close,
-                    color: AppColor.baseLight[80],
-                  ))),
-        );
+      return AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: provider.getPinCode.isNotEmpty ? 1 : 0.3,
+        child: InkWell(
+            onTap: provider.removeValue,
+            child: Transform.scale(
+                scale: 0.8,
+                child: SvgPicture.asset(
+                  AppIcons.close,
+                  color: AppColor.baseLight[80],
+                ))),
+      );
     });
-  }
-}
-
-/// FIXME: change name
-class ButtonView extends StatelessWidget {
-  const ButtonView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
-    return SizedBox.expand(
-      child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: orientation == Orientation.portrait ? 3 : 6,
-            childAspectRatio: (125 / 90),
-            crossAxisSpacing: 30.0,
-            mainAxisSpacing: 4.0,
-          ),
-          itemCount: 12,
-          itemBuilder: (_, idx) {
-            ///FIXME: help refactor me
-            if (orientation == Orientation.portrait) {
-              if (idx == 9) {
-                return const RemoveButton();
-              } else if (idx == 11) {
-                return const Arrow();
-              } else {
-                return NumberButton(number: idx == 10 ? 0 : idx + 1);
-              }
-            } else {
-              if (idx == 9) {
-                return const NumberButton(number: 0);
-              } else if (idx == 11) {
-                return const SizedBox();
-              } else if (idx == 10) {
-                return const Arrow();
-              } else {
-                return NumberButton(number: idx + 1);
-              }
-            }
-          }),
-    );
   }
 }
 
@@ -183,6 +140,49 @@ class Arrow extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// FIXME: change name
+class ButtonView extends StatelessWidget {
+  const ButtonView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+    return SizedBox.expand(
+      child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: orientation == Orientation.portrait ? 3 : 6,
+            childAspectRatio: (125 / 90),
+            crossAxisSpacing: 30.0,
+            mainAxisSpacing: 4.0,
+          ),
+          itemCount: 12,
+          itemBuilder: (_, idx) {
+            ///FIXME: help!!! refactor me
+            if (orientation == Orientation.portrait) {
+              if (idx == 9) {
+                return const RemoveButton();
+              } else if (idx == 11) {
+                return const Arrow();
+              } else {
+                return NumberButton(number: idx == 10 ? 0 : idx + 1);
+              }
+            } else {
+              if (idx == 10) {
+                return const NumberButton(number: 0);
+              } else if (idx == 11) {
+                return const Arrow();
+              } else if (idx == 6) {
+                return const RemoveButton();
+              } else {
+                return NumberButton(number: idx <= 6 ? idx + 1 : idx);
+              }
+            }
+          }),
     );
   }
 }
