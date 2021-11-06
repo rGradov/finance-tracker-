@@ -94,6 +94,31 @@ class Header extends StatelessWidget {
   }
 }
 
+/// how it works? we listen the value in provider
+/// and then if the pin length =4 we displayed this button
+/// this button remove last number from pin
+class RemoveButton extends StatelessWidget {
+  const RemoveButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 400),
+          opacity: provider.getPinCode.length > 1?1:0.3,
+          child: InkWell(
+              onTap: () {},
+              child: Transform.scale(
+                  scale: 0.8,
+                  child: SvgPicture.asset(
+                    AppIcons.close,
+                    color: AppColor.baseLight[80],
+                  ))),
+        );
+    });
+  }
+}
+
 /// FIXME: change name
 class ButtonView extends StatelessWidget {
   const ButtonView({Key? key}) : super(key: key);
@@ -115,7 +140,7 @@ class ButtonView extends StatelessWidget {
             ///FIXME: help refactor me
             if (orientation == Orientation.portrait) {
               if (idx == 9) {
-                return const SizedBox();
+                return const RemoveButton();
               } else if (idx == 11) {
                 return const Arrow();
               } else {
@@ -123,14 +148,13 @@ class ButtonView extends StatelessWidget {
               }
             } else {
               if (idx == 9) {
-                return const NumberButton(number:0);
+                return const NumberButton(number: 0);
               } else if (idx == 11) {
                 return const SizedBox();
-              }else if(idx ==10){
+              } else if (idx == 10) {
                 return const Arrow();
-              }
-              else {
-                return NumberButton(number:  idx + 1);
+              } else {
+                return NumberButton(number: idx + 1);
               }
             }
           }),
