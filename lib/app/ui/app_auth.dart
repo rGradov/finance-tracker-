@@ -1,23 +1,32 @@
+import 'package:finance_tracker/app/provider/pin_code_provider.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class PinScreen extends StatelessWidget {
   const PinScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.violet[100],
-      body: SafeArea(
-        child: Column(
-          children: const [
-            Expanded(flex: 2, child: Header()),
-            Expanded(
-              flex: 5,
-              child: Circles(),
-            ),
-            Expanded(flex: 12, child: ButtonView()),
-          ],
+    return ChangeNotifierProvider(
+      create: (_) => PinCodeProvider(),
+      child: Scaffold(
+        backgroundColor: AppColor.violet[100],
+        body: SafeArea(
+          child: Column(
+            children: const [
+              Expanded(flex: 2, child: Header()),
+              Expanded(
+                flex: 4,
+                child: Circles(),
+              ),
+
+              /// DONT TUCH THIS FLEX VALUE
+              Expanded(flex: 5, child: ButtonView()),
+            ],
+          ),
         ),
       ),
     );
@@ -29,31 +38,33 @@ class Circles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.blue,
-          ),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.blue,
-          ),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.blue,
-          ),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.blue,
-          ),
-        ],
-      ),
-    );
+    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 40),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColor.baseLight[80]!,
+            ),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColor.baseLight[80]!,
+            ),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColor.baseLight[80]!,
+            ),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColor.baseLight[80]!,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -66,7 +77,7 @@ class Header extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 100),
         child: Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.center,
 
           /// TODO: extract me
           child: Text(
@@ -83,47 +94,74 @@ class Header extends StatelessWidget {
   }
 }
 
+/// FIXME: change name
 class ButtonView extends StatelessWidget {
   const ButtonView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
     return SizedBox.expand(
       child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: orientation == Orientation.portrait ? 3 : 6,
+            childAspectRatio: (125 / 90),
             crossAxisSpacing: 30.0,
             mainAxisSpacing: 4.0,
           ),
           itemCount: 12,
           itemBuilder: (_, idx) {
-           if(idx ==9){
-             return const SizedBox();
-           } else if (idx ==11) {
-             return const Arrow();
-           } else {
-             return NumberButton(number: idx+1,);
-           }
+            ///FIXME: help refactor me
+            if (orientation == Orientation.portrait) {
+              if (idx == 9) {
+                return const SizedBox();
+              } else if (idx == 11) {
+                return const Arrow();
+              } else {
+                return NumberButton(number: idx == 10 ? 0 : idx + 1);
+              }
+            } else {
+              if (idx == 9) {
+                return const NumberButton(number:0);
+              } else if (idx == 11) {
+                return const SizedBox();
+              }else if(idx ==10){
+                return const Arrow();
+              }
+              else {
+                return NumberButton(number:  idx + 1);
+              }
+            }
           }),
     );
   }
 }
+
 class Arrow extends StatelessWidget {
   const Arrow({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return  InkWell(
-        onTap: (){
-          print('arrow');
-        },
-        /// FIXME: change icon to arrow
-        child:  const Icon(Icons.forward,));
+    return Consumer<PinCodeProvider>(
+      builder: (_, provider, __) {
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: provider.isValid ? 1 : 0.3,
+          child: InkWell(
+            onTap: () {
+              if (provider.isValid) {}
+            },
+            child: Transform.scale(
+              scale: 0.4,
+              child: SvgPicture.asset(AppIcons.arrowRight),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
-
 
 class NumberButton extends StatelessWidget {
   final int number;
@@ -131,23 +169,27 @@ class NumberButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        print(number.toString());
-      },
-      child: ColoredBox(
-        color: Colors.transparent,
-        child: Center(
-          child: Text(
-            number.toString(),
-            style: TextStyle(
-                color: AppColor.baseLight[80],
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 48),
+    return Consumer<PinCodeProvider>(
+      builder: (_, provider, __) {
+        return InkWell(
+          onTap: () {
+            provider.setValue(number);
+          },
+          child: ColoredBox(
+            color: Colors.transparent,
+            child: Center(
+              child: Text(
+                number.toString(),
+                style: TextStyle(
+                    color: AppColor.baseLight[80],
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 48),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

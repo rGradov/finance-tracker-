@@ -18,7 +18,10 @@ package: resources
 groups:
   - path: assets/images
     class_name: AppImages
-    types: [ .png, .jpg, .jpeg, .webp, .webm, .bmp ]
+    types: [ .png, .jpg, .jpeg,]
+  - path: assets/icons
+    class_name: AppIcons
+    types: [ .svg]
 #  - path: assets/vectors
 #    class_name: Svgs
 #    package: res
