@@ -6,29 +6,36 @@ class SetupAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    final orientation = MediaQuery.of(context).orientation;
+    return Scaffold(
       backgroundColor: AppColor.baseLight[100],
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Stack(
-          children:  [
+          children: [
             FractionallySizedBox(
               heightFactor: 0.35,
               child: FractionallySizedBox(
-                widthFactor: 0.8,
-                child: Column(
+                widthFactor: orientation == Orientation.portrait ? 0.8 : 1,
+                child:  Column(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children:const [
-                    Spacer(flex: 3,),
+                  crossAxisAlignment: orientation == Orientation.portrait
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.center,
+                  children: const [
+                    Spacer(
+                      flex: 3,
+                    ),
                     Header(),
-                    Spacer(flex: 1,),
+                    Spacer(
+                      flex: 1,
+                    ),
                     SubHeader(),
                   ],
                 ),
               ),
             ),
-            const NextButton(),
+            const NextButton(text: "Let's go",),
           ],
         ),
       ),
@@ -41,44 +48,65 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Text('Let’s setup your account!',style:TextStyle(
-        color: AppColor.baseDark[50],
-        fontFamily: 'Inter',
-        fontWeight: FontWeight.w500,
-        fontSize: 36),);
+    return Text(
+      'Let’s setup your account!',
+      style: TextStyle(
+          color: AppColor.baseDark[50],
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+          fontSize: 36),
+    );
   }
 }
+
 class SubHeader extends StatelessWidget {
   const SubHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return  Text("Account can be your bank, credit card or your wallet.",style:TextStyle(
-        color: AppColor.baseDark[50],
-        fontFamily: 'Inter',
-        fontWeight: FontWeight.w500,
-        fontSize: 14),);
-  }
-}
-
-class NextButton extends StatelessWidget {
-  const NextButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          constraints: const BoxConstraints(maxHeight: 56),
-          color: Colors.yellow,
-        ),
-       const  SizedBox(height: 30,),
-      ],
+    return Text(
+      "Account can be your bank, credit card or your wallet.",
+      style: TextStyle(
+          color: AppColor.baseDark[50],
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w500,
+          fontSize: 14),
     );
   }
 }
 
+class NextButton extends StatelessWidget {
+  final String text;
+  const NextButton({Key? key,required this.text}) : super(key: key);
 
-
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          constraints: const BoxConstraints(maxHeight: 60),
+          decoration: BoxDecoration(
+            color: AppColor.violet[100]!,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(20),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                  color: AppColor.baseLight[80],
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+      ],
+    );
+  }
+}

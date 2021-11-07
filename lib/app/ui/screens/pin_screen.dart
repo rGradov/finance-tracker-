@@ -14,6 +14,7 @@ class PinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double _screenHeight = ScreenSize().screenHeight;
+    final int flex = _screenHeight<700?1:2;
     return ChangeNotifierProvider(
       create: (_) => PinCodeProvider(),
       child: Scaffold(
@@ -25,7 +26,7 @@ class PinScreen extends StatelessWidget {
               const Expanded(flex: 1, child: Header()),
               const Expanded(flex: 3, child: PinCircles()),
               Spacer(
-                flex: _screenHeight < 700 ? 1 : 2,
+                flex:flex,
               ),
               const Expanded(flex: 5, child: CustomNumberKeyboard()),
             ],
