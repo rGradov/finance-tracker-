@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:finance_tracker/app/ui/screens/pin_screen.dart';
+import 'package:finance_tracker/app/ui/screens/setup_account_screen.dart';
 
-import '../app_auth.dart';
 
-abstract class Screens {
-  static const main = '/';
+abstract class AppRoutes {
+  static const mainRoute = '/';
+  static const setupAccountRoute = '/setup';
 
 }
 class MainNavigation {
   Map<String, WidgetBuilder> get routes => <String, WidgetBuilder>{
-    Screens.main:(_)=>const PinScreen()};
+    AppRoutes.mainRoute:(_)=>const PinScreen(),
+    AppRoutes.setupAccountRoute:(_)=>const SetupAccountScreen(),
+  };
 
 
   Route<dynamic>? onGenerateRoute(RouteSettings settings){

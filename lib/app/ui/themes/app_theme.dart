@@ -6,23 +6,31 @@ abstract class AppTheme {
   );
 }
 abstract class AppColor {
+  /// violet
   static const MaterialColor violet =
   MaterialColor(_primary, <int, Color>{
-    50: Color(0xFFE6FFFF),
-    100: Color(0xFF7F3DFF),
-    200: Color(0xFF94E9FF),
-    300: Color(0xFF6ACDFF),
-    400: Color(0xFF4CBAFF),
-    500: Color(0xFF05A5FF),
-    600: Color(0xFF0095EB),
-    700: Color(0xFF0080D1),
-    800: Color(0xFF006BB7),
-    900: Color(0xFF00559B),
+    20:Color(0xFFEEE5FF),
+    40:Color(0xFFD3BDFF),
+    60:Color(0xFFB18AFF),
+    80:Color(0xFF8F57FF),
+    100:Color(0xFF7F3DFF),
   });
+  /// Light
   static const MaterialColor baseLight = MaterialColor(_base, <int,Color>{
-    80:Color(0xFFFCFCFC),
-
+    20:Color(0xFFE3E5E5),
+    40:Color(0xFFF2F4F5),
+    60:Color(0xFFF7F9FA),
+    80:Color(0xFFFBFBFB),
+    100:Color(0xFFFFFFFF),
 });
+/// dark
+  static const MaterialColor baseDark = MaterialColor(_baseDark, <int,Color>{
+    25:Color(0xFF7A7E80),
+    50:Color(0xFF464A4D),
+    75:Color(0xFF161719),
+    100:Color(0xFF0D0E0F),
+  });
   static const int _base = 0xFF00000;
+  static const int _baseDark =0xFF0D0E0F;
   static const int _primary = 0xFF05A5FF;
 }

@@ -1,8 +1,10 @@
+import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:flutter/material.dart';
+
 import 'package:finance_tracker/app/provider/pin_code_provider.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/utils/app_screen_size.dart';
 import 'package:finance_tracker/resources/resources.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +24,9 @@ class PinScreen extends StatelessWidget {
             children: [
               const Expanded(flex: 1, child: Header()),
               const Expanded(flex: 3, child: PinCircles()),
-              Spacer(flex: _screenHeight < 700 ? 1 : 2,),
+              Spacer(
+                flex: _screenHeight < 700 ? 1 : 2,
+              ),
               const Expanded(flex: 5, child: CustomNumberKeyboard()),
             ],
           ),
@@ -38,29 +42,27 @@ class PinCircles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
-    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
-      return ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (_, idx) {
-            return CircleHidingNumber(idx: idx);
-          },
-          separatorBuilder: (_, idx) {
-            if (orientation == Orientation.portrait) {
-              return const SizedBox(
-                width: 16,
-                height: 16,
-              );
-            } else {
-              return const SizedBox(
-                width: 64,
-                height: 64,
-              );
-            }
-          },
-          scrollDirection: Axis.horizontal,
-          itemCount: 4);
-    });
+    return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (_, idx) {
+          return CircleHidingNumber(idx: idx);
+        },
+        separatorBuilder: (_, idx) {
+          if (orientation == Orientation.portrait) {
+            return const SizedBox(
+              width: 16,
+              height: 16,
+            );
+          } else {
+            return const SizedBox(
+              width: 64,
+              height: 64,
+            );
+          }
+        },
+        scrollDirection: Axis.horizontal,
+        itemCount: 4);
   }
 }
 
@@ -100,10 +102,13 @@ class Header extends StatelessWidget {
           child: Text(
             /// TODO: translate me
             "Let’s  setup your PIN",
+
             /// TODO: extract me
             style: TextStyle(
                 color: AppColor.baseLight[80],
-                fontFamily: 'Inter',/// don't forget about me too
+                fontFamily: 'Inter',
+
+                /// don't forget about me too
                 fontWeight: FontWeight.w600,
                 fontSize: 18),
           ),
@@ -150,7 +155,9 @@ class NextButton extends StatelessWidget {
           opacity: provider.isValid ? 1 : 0.3,
           child: InkWell(
             onTap: () {
-              if (provider.isValid) {}
+              if (provider.isValid) {
+                Navigator.pushNamed(context, AppRoutes.setupAccountRoute);
+              }
             },
             child: Transform.scale(
               scale: 0.4,
@@ -162,6 +169,7 @@ class NextButton extends StatelessWidget {
     );
   }
 }
+
 /// remove button and next button very similar (by code and logic) but i doesn't
 /// wont to merge them into one Widget
 
