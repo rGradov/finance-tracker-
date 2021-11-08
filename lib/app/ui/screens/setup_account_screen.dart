@@ -1,3 +1,4 @@
+import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -85,32 +86,36 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          constraints: const BoxConstraints(maxHeight: 60),
-          decoration: BoxDecoration(
-            color: AppColor.violet[100]!,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(20),
+    return GestureDetector(
+      onTap: ()=>Navigator.pushNamed(context, AppRoutes.addedNewAccount),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            constraints: const BoxConstraints(maxHeight: 60),
+            decoration: BoxDecoration(
+              color: AppColor.violet[100]!,
+              borderRadius: const BorderRadius.all(
+                Radius.circular(20),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                text,
+                style: TextStyle(
+                    color: AppColor.baseLight[80],
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18),
+              ),
             ),
           ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(
-                  color: AppColor.baseLight[80],
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18),
-            ),
+          const SizedBox(
+            height: 30,
           ),
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-      ],
+        ],
+      ),
     );
   }
+
 }

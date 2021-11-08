@@ -32,6 +32,7 @@ dependencies:
   json_annotation: ^4.0.1
   local_auth: ^1.1.7
   flutter_svg: ^0.22.0
+  animations: ^2.0.2
 
 dev_dependencies:
   build_runner: ^2.1.2
