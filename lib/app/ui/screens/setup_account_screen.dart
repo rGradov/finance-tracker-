@@ -35,6 +35,7 @@ class SetupAccountScreen extends StatelessWidget {
                 ),
               ),
             ),
+            /// Translate me
             const NextButton(text: "Let's go",),
           ],
         ),
@@ -43,12 +44,14 @@ class SetupAccountScreen extends StatelessWidget {
   }
 }
 
+
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Text(
+      /// TODO: translate me
       'Let’s setup your account!',
       style: TextStyle(
           color: AppColor.baseDark[50],
@@ -65,6 +68,7 @@ class SubHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      /// TODO: translate me
       "Account can be your bank, credit card or your wallet.",
       style: TextStyle(
           color: AppColor.baseDark[50],
