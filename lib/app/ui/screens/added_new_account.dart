@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 ///
 /// */
 ///
+/// Important to trace this account types
 enum AccountTypes { wallet, creditCard, bank }
 
 class AddedNewAccountScreen extends StatelessWidget {
@@ -32,7 +33,7 @@ class AddedNewAccountScreen extends StatelessWidget {
     );
   }
 }
-
+/// TODO: extract it because we use it at the same screen's
 class TopNavigation extends StatelessWidget {
   const TopNavigation({Key? key}) : super(key: key);
 
@@ -61,12 +62,15 @@ class TopNavigation extends StatelessWidget {
     );
   }
 }
+
+/// How it should work => if we change the account type we can change it
+/// in header of the top Navigation example: Added new Bank/Wallet/Credit Card
 class TopNavigationBackButton extends StatelessWidget {
   const TopNavigationBackButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    /// TODO: change to something beautifly
+    /// TODO: change to something beautifully
     return  InkWell(
       onTap:()=>Navigator.pop(context),
       child: RotatedBox(
