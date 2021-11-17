@@ -1,10 +1,9 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
-import 'package:flutter/material.dart';
-
-import 'package:finance_tracker/app/provider/pin_code_provider.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/utils/app_screen_size.dart';
+import 'package:finance_tracker/app/view_model/pin_code_view_model.dart';
 import 'package:finance_tracker/resources/resources.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -14,19 +13,18 @@ class PinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double _screenHeight = ScreenSize().screenHeight;
-    final int flex = _screenHeight<700?1:2;
+    final int flex = _screenHeight < 700 ? 1 : 2;
     return ChangeNotifierProvider(
-      create: (_) => PinCodeProvider(),
+      create: (_) => PinCodeViewModel(),
       child: Scaffold(
         backgroundColor: AppColor.violet[100],
         body: SafeArea(
           child: Column(
-            /// DON'T CHANGE THIS FLEX VALUES
             children: [
-              const Expanded(flex: 1, child: Header()),
-              const Expanded(flex: 3, child: PinCircles()),
+              const Expanded(flex: 1, child: _Header()),
+              const Expanded(flex: 3, child: _PinCircles()),
               Spacer(
-                flex:flex,
+                flex: flex,
               ),
               const Expanded(flex: 5, child: CustomNumberKeyboard()),
             ],
@@ -37,8 +35,11 @@ class PinScreen extends StatelessWidget {
   }
 }
 
-class PinCircles extends StatelessWidget {
-  const PinCircles({Key? key}) : super(key: key);
+/// this circles used for inputting pin code: in nutshell it work like this
+/// we click on one number button  => see fill circle if click on [ X ] remove
+/// button see circle with opacity
+class _PinCircles extends StatelessWidget {
+  const _PinCircles({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,29 +70,30 @@ class PinCircles extends StatelessWidget {
 
 class CircleHidingNumber extends StatelessWidget {
   final int idx;
+
   const CircleHidingNumber({Key? key, required this.idx}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
-      return AnimatedContainer(
-        curve: Curves.decelerate,
-        duration: const Duration(milliseconds: 300),
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: provider.pin.length <= idx
-              ? Colors.white.withOpacity(0.4)
-              : AppColor.baseLight[80],
-        ),
-      );
-    });
+    final int numberOfCircles =
+        context.select((PinCodeViewModel vm) => vm.numberOfCircles);
+    return AnimatedContainer(
+      curve: Curves.decelerate,
+      duration: const Duration(milliseconds: 300),
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: numberOfCircles <= idx
+            ? Colors.white.withOpacity(0.4)
+            : AppColor.baseLight[80],
+      ),
+    );
   }
 }
 
-class Header extends StatelessWidget {
-  const Header({Key? key}) : super(key: key);
+class _Header extends StatelessWidget {
+  const _Header({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +121,7 @@ class Header extends StatelessWidget {
   }
 }
 
-/// how it works? we listen the value in provider
+/// how it works? we listen the value in ViewModel
 /// and then if the pin length =4 we displayed this button
 /// this button remove last number from pin
 class RemoveButton extends StatelessWidget {
@@ -127,20 +129,31 @@ class RemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PinCodeProvider>(builder: (_, provider, __) {
-      return AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: provider.getPin.isNotEmpty ? 1 : 0.3,
-        child: InkWell(
-            onTap: provider.removeValue,
-            child: Transform.scale(
-                scale: 0.8,
-                child: SvgPicture.asset(
-                  AppIcons.close,
-                  color: AppColor.baseLight[80],
-                ))),
-      );
-    });
+    final bool existCircles = context.watch<PinCodeViewModel>().existCircles;
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 300),
+      opacity: existCircles ? 1 : 0.3,
+      child: const _RemoveButton(),
+    );
+  }
+}
+
+class _RemoveButton extends StatelessWidget {
+  const _RemoveButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<PinCodeViewModel>();
+    return InkWell(
+      onTap: vm.onRemoveButtonPressed,
+      child: Transform.scale(
+        scale: 0.8,
+        child: SvgPicture.asset(
+          AppIcons.close,
+          color: AppColor.baseLight[80],
+        ),
+      ),
+    );
   }
 }
 
@@ -149,24 +162,31 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PinCodeProvider>(
-      builder: (_, provider, __) {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
-          opacity: provider.isValid ? 1 : 0.3,
-          child: InkWell(
-            onTap: () {
-              if (provider.isValid) {
-                Navigator.pushNamed(context, AppRoutes.setupAccountRoute);
-              }
-            },
-            child: Transform.scale(
-              scale: 0.4,
-              child: SvgPicture.asset(AppIcons.arrowRight),
-            ),
-          ),
-        );
+    final bool isValid = context.select((PinCodeViewModel vm) => vm.isValid);
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 300),
+      opacity: isValid ? 1 : 0.3,
+      child: const _NextButton(),
+    );
+  }
+}
+
+class _NextButton extends StatelessWidget {
+  const _NextButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<PinCodeViewModel>();
+    return InkWell(
+      onTap: () {
+        if (vm.isValid) {
+          Navigator.pushNamed(context, AppRoutes.setupAccountRoute);
+        }
       },
+      child: Transform.scale(
+        scale: 0.4,
+        child: SvgPicture.asset(AppIcons.arrowRight),
+      ),
     );
   }
 }
@@ -219,31 +239,29 @@ class CustomNumberKeyboard extends StatelessWidget {
 
 class NumberButton extends StatelessWidget {
   final int number;
+
   const NumberButton({Key? key, required this.number}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PinCodeProvider>(
-      builder: (_, provider, __) {
-        return InkWell(
-          onTap: () {
-            provider.setValue(number);
-          },
-          child: ColoredBox(
-            color: Colors.transparent,
-            child: Center(
-              child: Text(
-                number.toString(),
-                style: TextStyle(
-                    color: AppColor.baseLight[80],
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 48),
-              ),
-            ),
-          ),
-        );
+    final vm = context.read<PinCodeViewModel>();
+    return InkWell(
+      onTap: () {
+        vm.onNumberButtonPressed(number);
       },
+      child: ColoredBox(
+        color: Colors.transparent,
+        child: Center(
+          child: Text(
+            number.toString(),
+            style: TextStyle(
+                color: AppColor.baseLight[80],
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                fontSize: 48),
+          ),
+        ),
+      ),
     );
   }
 }

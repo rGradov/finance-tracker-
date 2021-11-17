@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
-import 'package:finance_tracker/app/ui/screens/added_new_account.dart';
+import 'package:finance_tracker/app/ui/view/added_new_account.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_tracker/app/ui/screens/pin_screen.dart';
-import 'package:finance_tracker/app/ui/screens/setup_account_screen.dart';
+import 'package:finance_tracker/app/ui/view/pin_screen.dart';
+import 'package:finance_tracker/app/ui/view/setup_account_screen.dart';
 
 
 abstract class AppRoutes {
