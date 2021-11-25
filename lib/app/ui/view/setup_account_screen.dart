@@ -1,4 +1,5 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class SetupAccountScreen extends StatelessWidget {
               heightFactor: 0.35,
               child: FractionallySizedBox(
                 widthFactor: orientation == Orientation.portrait ? 0.8 : 1,
-                child:  Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: orientation == Orientation.portrait
                       ? CrossAxisAlignment.end
@@ -36,15 +37,17 @@ class SetupAccountScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             /// Translate me
-            const NextButton(text: "Let's go",),
+            const NextButton(
+              text: "Let's go",
+            ),
           ],
         ),
       ),
     );
   }
 }
-
 
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
@@ -82,40 +85,11 @@ class SubHeader extends StatelessWidget {
 
 class NextButton extends StatelessWidget {
   final String text;
-  const NextButton({Key? key,required this.text}) : super(key: key);
+
+  const NextButton({Key? key, required this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: ()=>Navigator.pushNamed(context, AppRoutes.addedNewAccount),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxHeight: 60),
-            decoration: BoxDecoration(
-              color: AppColor.violet[100]!,
-              borderRadius: const BorderRadius.all(
-                Radius.circular(20),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                    color: AppColor.baseLight[80],
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-        ],
-      ),
-    );
+    return FillButton(text: text, routeName: AppRoutes.addedNewAccount);
   }
-
 }
