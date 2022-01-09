@@ -1,4 +1,5 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/view_model/added_new_wallet_vm.dart';
@@ -33,7 +34,9 @@ class AddedNewAccountScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                TopNavigation(),
+                TopNavigation(
+                  headerText: 'Added new wallet',
+                ),
                 Spacer(flex: 6),
                 _BalanceInput(),
                 SizedBox(height: 20),
@@ -47,63 +50,9 @@ class AddedNewAccountScreen extends StatelessWidget {
   }
 }
 
-/// TODO: extract it because we use it at the same screen's
-class TopNavigation extends StatelessWidget {
-  const TopNavigation({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 64),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const TopNavigationBackButton(),
 
-              /// TODO: translate me extract me
-              Text(
-                'Added new wallet',
-                style: TextStyle(
-                    color: AppColor.baseLight[80],
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18),
-              ),
-              const SizedBox(
-                width: 10,
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
-/// How it should work => if we change the account type we can change it
-/// in header of the top Navigation example: Added new Bank/Wallet/Credit Card
-class TopNavigationBackButton extends StatelessWidget {
-  const TopNavigationBackButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    /// TODO: change to something beautifully
-    return InkWell(
-      onTap: () => Navigator.pop(context),
-      child: RotatedBox(
-        quarterTurns: 2,
-        child: SvgPicture.asset(
-          AppIcons.arrowRight,
-          width: 16,
-          height: 16,
-        ),
-      ),
-    );
-  }
-}
 
 /// FIXME: change my name ( make it more better )
 /// it should be rounded container with dropdown and inputted field
