@@ -40,7 +40,6 @@ class UserPinIncorrect extends UserPinState with EquatableMixin {
 }
 
 class UserPinCubit extends Cubit<UserPinState> {
-  static final RegExp nameRegExp = RegExp('[a-zA-Z]');
   final UserRepo _repository;
 
   UserPinCubit(this._repository) : super(const UserPinEmpty());
