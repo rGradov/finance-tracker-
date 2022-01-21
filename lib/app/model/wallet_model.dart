@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 enum WalletType {
   bank,
   card,
@@ -9,13 +11,13 @@ enum CurrencyType {
   bellRuble,
 }
 
-class WalletModel {
+class WalletModel extends Equatable {
   final String name;
   final WalletType type;
   final double balance;
   final CurrencyType currencyType;
 
-  WalletModel(this.name, this.type, this.balance, this.currencyType);
+  const WalletModel(this.name, this.type, this.balance, this.currencyType);
   WalletModel copyWith({
     String? name,
     WalletType? type,
@@ -25,4 +27,7 @@ class WalletModel {
     return WalletModel(name ?? this.name, type ?? this.type,
         balance ?? this.balance, currencyType ?? this.currencyType);
   }
+
+  @override
+  List<Object?> get props => [name,type,balance,currencyType];
 }

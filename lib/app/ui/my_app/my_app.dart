@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme:AppTheme.light,
       onGenerateRoute:mainNavigation.onGenerateRoute,
-      home: const SignUpScreen(),
+      home: const PinScreen(),
     );
   }
 }

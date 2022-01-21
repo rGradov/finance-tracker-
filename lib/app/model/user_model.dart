@@ -1,11 +1,14 @@
-class UserModel {
-  final String pinCode;
+import 'package:equatable/equatable.dart';
 
-  UserModel(this.pinCode);
-
+class UserModel extends Equatable {
+ const UserModel(this.pinCode);
+ final String pinCode;
   UserModel copyWith({
     String? pinCode,
   }) {
     return UserModel(pinCode ?? this.pinCode);
   }
+
+  @override
+  List<Object?> get props => [pinCode];
 }

@@ -1,11 +1,12 @@
+import 'package:finance_tracker/app/repository/user_code_repo.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/utils/app_screen_size.dart';
-import 'package:finance_tracker/app/view_model/pin_code_view_model.dart';
+import 'package:finance_tracker/bloc/user/user_pin.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 class PinScreen extends StatelessWidget {
   const PinScreen({Key? key}) : super(key: key);
@@ -14,8 +15,9 @@ class PinScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double _screenHeight = ScreenSize().screenHeight;
     final int flex = _screenHeight < 700 ? 1 : 2;
-    return ChangeNotifierProvider(
-      create: (_) => PinCodeViewModel(),
+    return BlocProvider(
+      create: (_) => UserPinCubit(UserRepo()),
+      lazy: false,
       child: Scaffold(
         backgroundColor: AppColor.violet[100],
         body: SafeArea(
@@ -68,26 +70,43 @@ class _PinCircles extends StatelessWidget {
   }
 }
 
-class CircleHidingNumber extends StatelessWidget {
+class CircleHidingNumber extends StatefulWidget {
   final int idx;
 
   const CircleHidingNumber({Key? key, required this.idx}) : super(key: key);
 
   @override
+  _CircleHidingNumberState createState() => _CircleHidingNumberState();
+}
+
+class _CircleHidingNumberState extends State<CircleHidingNumber> {
+  int _displayedCircle = 0;
+
+  @override
   Widget build(BuildContext context) {
-    final int numberOfCircles =
-        context.select((PinCodeViewModel vm) => vm.numberOfCircles);
-    return AnimatedContainer(
-      curve: Curves.decelerate,
-      duration: const Duration(milliseconds: 300),
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: numberOfCircles <= idx
-            ? Colors.white.withOpacity(0.4)
-            : AppColor.baseLight[80],
-      ),
+    return BlocConsumer<UserPinCubit, UserPinState>(
+      listener: (_, state) {
+        if (state is UserPinChanged) {
+          _displayedCircle = state.displayedCircles;
+        }
+        if (state is UserPinEmpty) {
+          _displayedCircle = 0;
+        }
+      },
+      builder: (_, state) {
+        return AnimatedContainer(
+          curve: Curves.decelerate,
+          duration: const Duration(milliseconds: 300),
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _displayedCircle <= widget.idx
+                ? Colors.white.withOpacity(0.4)
+                : AppColor.baseLight[80],
+          ),
+        );
+      },
     );
   }
 }
@@ -124,16 +143,34 @@ class _Header extends StatelessWidget {
 /// how it works? we listen the value in ViewModel
 /// and then if the pin length =4 we displayed this button
 /// this button remove last number from pin
-class RemoveButton extends StatelessWidget {
+class RemoveButton extends StatefulWidget {
   const RemoveButton({Key? key}) : super(key: key);
 
   @override
+  _RemoveButtonState createState() => _RemoveButtonState();
+}
+
+class _RemoveButtonState extends State<RemoveButton> {
+  bool _canInteract = false;
+
+  @override
   Widget build(BuildContext context) {
-    final bool existCircles = context.watch<PinCodeViewModel>().existCircles;
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 300),
-      opacity: existCircles ? 1 : 0.3,
-      child: const _RemoveButton(),
+    return BlocListener<UserPinCubit, UserPinState>(
+      listener: (_, state) {
+        if (state is UserPinChanged) {
+          _canInteract = true;
+          setState(() {});
+        }
+        if (state is UserPinEmpty) {
+          _canInteract = false;
+          setState(() {});
+        }
+      },
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: _canInteract ? 1 : 0.3,
+        child: const _RemoveButton(),
+      ),
     );
   }
 }
@@ -143,9 +180,9 @@ class _RemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<PinCodeViewModel>();
+    final userPinCubit = BlocProvider.of<UserPinCubit>(context);
     return InkWell(
-      onTap: vm.onRemoveButtonPressed,
+      onTap: () => userPinCubit.onUserPinDecrement(),
       child: Transform.scale(
         scale: 0.8,
         child: SvgPicture.asset(
@@ -162,30 +199,47 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isValid = context.select((PinCodeViewModel vm) => vm.isValid);
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 300),
-      opacity: isValid ? 1 : 0.3,
-      child: const _NextButton(),
-    );
+    return BlocBuilder<UserPinCubit, UserPinState>(builder: (_, state) {
+      return AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: state is UserPinCorrect ? 1 : 0.3,
+        child: const _NextButton(),
+      );
+    });
   }
 }
 
-class _NextButton extends StatelessWidget {
+class _NextButton extends StatefulWidget {
   const _NextButton({Key? key}) : super(key: key);
 
   @override
+  __NextButtonState createState() => __NextButtonState();
+}
+
+class __NextButtonState extends State<_NextButton> {
+  bool _canNavigate = false;
+
+  @override
   Widget build(BuildContext context) {
-    final vm = context.read<PinCodeViewModel>();
-    return InkWell(
-      onTap: () {
-        if (vm.isValid) {
-          Navigator.pushNamed(context, AppRoutes.setupAccountRoute);
+    return BlocListener<UserPinCubit, UserPinState>(
+      listener: (_, state) {
+        if (state is UserPinCorrect) {
+          _canNavigate = true;
+        }
+        if (state is UserPinChanged) {
+          _canNavigate = false;
         }
       },
-      child: Transform.scale(
-        scale: 0.4,
-        child: SvgPicture.asset(AppIcons.arrowRight),
+      child: InkWell(
+        onTap: () {
+          if (_canNavigate) {
+            Navigator.pushNamed(context, AppRoutes.setupAccountRoute);
+          }
+        },
+        child: Transform.scale(
+          scale: 0.4,
+          child: SvgPicture.asset(AppIcons.arrowRight),
+        ),
       ),
     );
   }
@@ -244,11 +298,9 @@ class NumberButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<PinCodeViewModel>();
+    final userPinCubit = BlocProvider.of<UserPinCubit>(context);
     return InkWell(
-      onTap: () {
-        vm.onNumberButtonPressed(number);
-      },
+      onTap: () => userPinCubit.onUserPinCodeIncrement(number),
       child: ColoredBox(
         color: Colors.transparent,
         child: Center(
