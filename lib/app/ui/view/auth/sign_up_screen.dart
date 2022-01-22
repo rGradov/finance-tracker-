@@ -2,9 +2,11 @@ import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/bloc/auth/password_bloc.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 enum TextFieldType { password, email, repeatPassword }
@@ -18,6 +20,8 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -30,12 +34,21 @@ class SignUpScreen extends StatelessWidget {
             Spacer(
               flex: 1,
             ),
-            Expanded(flex: 3, child: _FormWrapper()),
-            Spacer(
-              flex: 1,
-            ),
+            Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: _FormWrapper(),
+                )),
             _PrivacyPoliceWrapper(),
-            Expanded(flex: 2, child: _SignUpButtonsWrapper()),
+            Expanded(
+                flex: 3,
+                child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: _SignUpButtonsWrapper())),
+            Spacer(
+              flex: 3,
+            ),
           ],
         ),
       ),
@@ -79,7 +92,7 @@ class _FieldWrapper extends StatefulWidget {
 
 class _FieldWrapperState extends State<_FieldWrapper> {
   late TextEditingController _controller;
-
+  bool _needShow = false;
   @override
   void initState() {
     _controller = TextEditingController();
@@ -94,26 +107,50 @@ class _FieldWrapperState extends State<_FieldWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      obscureText: widget.type == TextFieldType.repeatPassword ||
-          widget.type == TextFieldType.password,
-      enableSuggestions: false,
-      autocorrect: false,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
-        suffixIcon: widget.type == TextFieldType.repeatPassword
-            ? const _HideIcon()
-            : const SizedBox(),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-      ),
-      minLines: 1,
-      maxLines: 1,
-      onChanged: (value) {},
-      controller: _controller,
-    );
+    return BlocProvider(create: (_) => PasswordCubit(),
+      child: BlocConsumer<PasswordCubit, PasswordBlocState>(
+        listener:(_,state){
+          if(state is HidePassword){
+            _needShow = false;
+          }
+          if(state is ShowPassword){
+            _needShow = true;
+          }
+        },
+        builder:(_,state){
+          return TextField(
+            obscureText: widget.type == TextFieldType.repeatPassword ||
+                widget.type == TextFieldType.password?_needShow:_needShow,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: InputDecoration(
+              fillColor: AppColor.baseLight[60],
+              hoverColor: AppColor.baseLight[60],
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.violet[100]!, width: 2.0),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
+              suffixIcon: widget.type == TextFieldType.repeatPassword
+                  ? const _HideIcon()
+                  : const SizedBox(),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            ),
+            minLines: 1,
+            maxLines: 1,
+            onChanged: (value) {},
+            controller: _controller,
+          );
+        }
+      ),);
   }
 }
 
@@ -123,14 +160,17 @@ class _PrivacyPoliceWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children:const [
-         _CheckBox(),
-       Expanded(child: _PrivacyText()),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      child: Row(
+        children: const [
+          _CheckBox(),
+          Expanded(child: _PrivacyText()),
 
-        /// TODO: added text
-        /// TODO: added link
-      ],
+          /// TODO: added text
+          /// TODO: added link
+        ],
+      ),
     );
   }
 }
@@ -142,32 +182,32 @@ class _PrivacyText extends StatelessWidget {
   Widget build(BuildContext context) {
     const _style = TextStyle(
       color: Colors.black,
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w600,
       fontFamily: 'Inter',
     );
     final _linkStyle = TextStyle(
       color: AppColor.violet[100],
       fontFamily: 'Inter',
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w500,
     );
-      return RichText(
-        text: TextSpan(
-          style: _style,
-          children: <TextSpan>[
-           const  TextSpan(text: 'By signing up, you agree to the '),
-            TextSpan(
-                text: 'Terms of Service  and Privacy Policy',
-                style: _linkStyle,
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                  }),
-          ],
-        ),
-      );
+    return RichText(
+      text: TextSpan(
+        style: _style,
+        children: <TextSpan>[
+          const TextSpan(text: 'By signing up, you agree to the '),
+          TextSpan(
+              text: 'Terms of Service  and Privacy Policy',
+              style: _linkStyle,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {}),
+        ],
+      ),
+    );
   }
 }
+
 class _CheckBox extends StatelessWidget {
   const _CheckBox({Key? key}) : super(key: key);
 
@@ -237,9 +277,12 @@ class _OrWith extends StatelessWidget {
       fontSize: 14,
       fontWeight: FontWeight.w700,
     );
-    return Text(
-      'Or with',
-      style: _style,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        'Or with',
+        style: _style,
+      ),
     );
   }
 }
@@ -315,6 +358,7 @@ class _SignUpGoogleButton extends StatelessWidget {
     );
     return Container(
         constraints: const BoxConstraints(maxHeight: 80, minHeight: 60),
+        padding: const EdgeInsets.symmetric(vertical: 15),
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.transparent,
@@ -325,7 +369,7 @@ class _SignUpGoogleButton extends StatelessWidget {
         ),
         child: FractionallySizedBox(
           alignment: Alignment.center,
-          widthFactor: 0.5,
+          widthFactor: 0.55,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -345,11 +389,14 @@ class _HideIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        /// TODO: implement logic
-      },
-      child: SvgPicture.asset(AppIcons.show),
+    final _action = BlocProvider.of<PasswordCubit>(context);
+    return Transform.scale(
+      scale: 0.6,
+      child: GestureDetector(
+        onTap: ()=>_action.showPassword(),
+        child: SvgPicture.asset(
+          AppIcons.show, color: Colors.black.withOpacity(0.2),),
+      ),
     );
   }
 }
