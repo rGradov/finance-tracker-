@@ -5,12 +5,22 @@ class FillButton extends StatelessWidget {
   /// FIXME: change my name ( next route)
   final String routeName;
   final String text;
+  final bool needPadding;
 
-  const FillButton({Key? key, required this.text, required this.routeName})
+  const FillButton(
+      {Key? key,
+      required this.text,
+      required this.routeName,
+      this.needPadding = true})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final _style = TextStyle(
+        color: AppColor.baseLight[80],
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w600,
+        fontSize: 18);
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, routeName),
       child: Column(
@@ -27,17 +37,15 @@ class FillButton extends StatelessWidget {
             child: Center(
               child: Text(
                 text,
-                style: TextStyle(
-                    color: AppColor.baseLight[80],
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18),
+                style: _style,
               ),
             ),
           ),
-          const SizedBox(
-            height: 30,
-          ),
+          needPadding
+              ? const SizedBox(
+                  height: 30,
+                )
+              : const SizedBox(),
         ],
       ),
     );

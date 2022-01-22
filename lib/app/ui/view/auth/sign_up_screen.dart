@@ -1,5 +1,9 @@
+import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
+import 'package:finance_tracker/app/ui/shared/fill_button.dart';
+import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/resources/resources.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -26,10 +30,12 @@ class SignUpScreen extends StatelessWidget {
             Spacer(
               flex: 1,
             ),
-            Expanded(flex: 4, child: _FormWrapper()),
+            Expanded(flex: 3, child: _FormWrapper()),
             Spacer(
-              flex: 2,
-            )
+              flex: 1,
+            ),
+            _PrivacyPoliceWrapper(),
+            Expanded(flex: 2, child: _SignUpButtonsWrapper()),
           ],
         ),
       ),
@@ -97,16 +103,12 @@ class _FieldWrapperState extends State<_FieldWrapper> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-
         hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
         suffixIcon: widget.type == TextFieldType.repeatPassword
             ? const _HideIcon()
             : const SizedBox(),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       ),
-      // textInputAction: widget.position == TextFieldPosition.last
-      //     ? TextInputAction.send
-      //     : TextInputAction.continueAction,
       minLines: 1,
       maxLines: 1,
       onChanged: (value) {},
@@ -114,6 +116,7 @@ class _FieldWrapperState extends State<_FieldWrapper> {
     );
   }
 }
+
 /// [_PrivacyPolice] use
 class _PrivacyPoliceWrapper extends StatelessWidget {
   const _PrivacyPoliceWrapper({Key? key}) : super(key: key);
@@ -121,14 +124,69 @@ class _PrivacyPoliceWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        /// TODO: added checkbox
+      children:const [
+         _CheckBox(),
+       Expanded(child: _PrivacyText()),
+
         /// TODO: added text
         /// TODO: added link
       ],
     );
   }
 }
+
+class _PrivacyText extends StatelessWidget {
+  const _PrivacyText({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    const _style = TextStyle(
+      color: Colors.black,
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Inter',
+    );
+    final _linkStyle = TextStyle(
+      color: AppColor.violet[100],
+      fontFamily: 'Inter',
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
+    );
+      return RichText(
+        text: TextSpan(
+          style: _style,
+          children: <TextSpan>[
+           const  TextSpan(text: 'By signing up, you agree to the '),
+            TextSpan(
+                text: 'Terms of Service  and Privacy Policy',
+                style: _linkStyle,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                  }),
+          ],
+        ),
+      );
+  }
+}
+class _CheckBox extends StatelessWidget {
+  const _CheckBox({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Checkbox(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      activeColor: AppColor.violet[100],
+      checkColor: AppColor.violet[100],
+      hoverColor: AppColor.violet[100],
+      tristate: false,
+      value: false,
+      onChanged: (status) {},
+    );
+  }
+}
+
 /// use it to wrap all action button's in signUp screen
 /// like [_SignUpButton] && [_SignUpGoogleButton] && [_AlreadyHaveAccount]
 class _SignUpButtonsWrapper extends StatelessWidget {
@@ -136,7 +194,16 @@ class _SignUpButtonsWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: const [
+        _SignUpButton(),
+        _OrWith(),
+        _SignUpGoogleButton(),
+        _AlreadyHaveAccountWrapper(),
+      ],
+    );
   }
 }
 
@@ -145,7 +212,15 @@ class _SignUpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return const AnimatedOpacity(
+      opacity: 1,
+      duration: Duration(milliseconds: 300),
+      child: FillButton(
+        needPadding: false,
+        text: 'Sign Up',
+        routeName: AppRoutes.addedNewAccount,
+      ),
+    );
   }
 }
 
@@ -155,31 +230,115 @@ class _OrWith extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    /// FIXME: added to Theme data
+    final _style = TextStyle(
+      color: AppColor.baseLight[20],
+      fontFamily: 'Inter',
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+    );
+    return Text(
+      'Or with',
+      style: _style,
+    );
   }
 }
+
 /// use it if user have an account
-class _AlreadyHaveAccount extends StatelessWidget {
-  const _AlreadyHaveAccount({Key? key}) : super(key: key);
+class _AlreadyHaveAccountWrapper extends StatelessWidget {
+  const _AlreadyHaveAccountWrapper({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    final _style = TextStyle(
+        color: AppColor.baseLight[20],
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        fontFamily: 'Inter');
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Already have an account?',
+          style: _style,
+        ),
+        const _LoginButton(),
+      ],
+    );
   }
 }
 
+class _LoginButton extends StatelessWidget {
+  const _LoginButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _style = TextStyle(
+      color: AppColor.violet[100]!,
+      fontSize: 16,
+      fontFamily: 'Inter',
+      decoration: TextDecoration.underline,
+    );
+    final _buttonStyle = ButtonStyle(
+      minimumSize: MaterialStateProperty.all(Size.zero),
+      padding: MaterialStateProperty.all(
+        const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+      ),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      overlayColor: MaterialStateProperty.all<Color>(
+        AppColor.violet[100]!.withOpacity(0.2),
+      ),
+    );
+    return TextButton(
+      onPressed: _onPress,
+      child: Text(
+        'login',
+        style: _style,
+      ),
+      style: _buttonStyle,
+    );
+  }
+
+  void _onPress() {}
+}
 
 class _SignUpGoogleButton extends StatelessWidget {
   const _SignUpGoogleButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    final _style = TextStyle(
+      color: AppColor.baseDark[50],
+      fontSize: 18,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w600,
+    );
+    return Container(
+        constraints: const BoxConstraints(maxHeight: 80, minHeight: 60),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(color: AppColor.baseLight[60]!),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+        child: FractionallySizedBox(
+          alignment: Alignment.center,
+          widthFactor: 0.5,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SvgPicture.asset(AppIcons.flatColorIconsGoogle),
+              Text(
+                'Sign Up with Google',
+                style: _style,
+              ),
+            ],
+          ),
+        ));
   }
 }
-
-
-
 
 class _HideIcon extends StatelessWidget {
   const _HideIcon({Key? key}) : super(key: key);

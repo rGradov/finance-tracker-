@@ -17,9 +17,9 @@ abstract class AppColor {
   });
   /// Light
   static const MaterialColor baseLight = MaterialColor(_base, <int,Color>{
-    20:Color(0xFFE3E5E5),
+    20:Color(0xFF91919F),
     40:Color(0xFFF2F4F5),
-    60:Color(0xFFF7F9FA),
+    60:Color(0xFFF1F1FA),
     80:Color(0xFFFBFBFB),
     100:Color(0xFFFFFFFF),
 });
