@@ -32,6 +32,17 @@ dependencies:
   json_annotation: ^4.0.1
   local_auth: ^1.1.7
   flutter_svg: ^0.22.0
+  animations: ^2.0.2
+  flutter_native_splash: ^1.2.3
+  flutter_launcher_icons: ^0.9.2
+flutter_icons:
+  #  image_path: "assets/images/icon-128x128.png"
+  image_path_android: "assets/images/launcher/icon.png"
+  image_path_ios: "assets/images/launcher/icon.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+  adaptive_icon_background: "assets/images/launcher/icon.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/images/launcher/icon.png" # only available for Android 8.0 devices and above
 
 dev_dependencies:
   build_runner: ^2.1.2
@@ -52,6 +63,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/
     - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see

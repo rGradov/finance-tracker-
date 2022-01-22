@@ -1,4 +1,5 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/view/pin_screen.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +11,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme:AppTheme.light,
-      routes: mainNavigation.routes,
       onGenerateRoute:mainNavigation.onGenerateRoute,
+      home: const PinScreen(),
     );
   }
 }
