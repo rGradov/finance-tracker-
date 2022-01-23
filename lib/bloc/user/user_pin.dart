@@ -42,8 +42,8 @@ class UserPinIncorrect extends UserPinState with EquatableMixin {
 class UserPinCubit extends Cubit<UserPinState> {
   final UserRepo _repository;
 
-  UserPinCubit(this._repository) : super(const UserPinEmpty());
 
+  UserPinCubit(this._repository) : super(const UserPinEmpty());
   void onUserPinCodeIncrement(int pinCode) {
     _repository.incrementPin(pinCode);
     emit(UserPinChanged(_repository.pin));
