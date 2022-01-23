@@ -1,7 +1,9 @@
+import 'package:finance_tracker/app/repository/local_auth_repository.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/utils/app_screen_size.dart';
+import 'package:finance_tracker/bloc/auth/local_auth_bloc.dart';
 import 'package:finance_tracker/bloc/user/user_pin.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
@@ -13,27 +15,40 @@ class PinScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LocalAuthRepository _repository = LocalAuthRepository();
     final double _screenHeight = ScreenSize().screenHeight;
     final int flex = _screenHeight < 700 ? 1 : 2;
-    return BlocProvider(
-      create: (_) => UserPinCubit(UserRepo()),
-      lazy: false,
-      child: Scaffold(
-        backgroundColor: AppColor.violet[100],
-        body: SafeArea(
-          child: Column(
-            children: [
-              const Expanded(flex: 1, child: _Header()),
-              const Expanded(flex: 3, child: _PinCircles()),
-              Spacer(
-                flex: flex,
-              ),
-              const Expanded(flex: 5, child: CustomNumberKeyboard()),
-            ],
-          ),
+    return MultiBlocProvider(
+        providers: [
+        BlocProvider(
+          create: (_) => UserPinCubit(UserRepo()),
+          lazy: false,
         ),
-      ),
-    );
+          BlocProvider<LocalAuthCubit>(
+            create: (_) => LocalAuthCubit(_repository)..checkAuth(),
+            lazy: false,
+          ),
+        ],
+        child: Scaffold(
+          backgroundColor: AppColor.violet[100],
+          body: SafeArea(
+            child: Column(
+              children: [
+                const Expanded(flex: 1, child: _Header()),
+                const Expanded(flex: 3, child: _PinCircles()),
+                Spacer(
+                  flex: flex,
+                ),
+                const Expanded(flex: 5, child: CustomNumberKeyboard()),
+              ],
+            ),
+          ),
+        ));
+    // return BlocProvider(
+    //   create: (_) => UserPinCubit(UserRepo()),
+    //   lazy: false,
+    //   child: ,
+    // );
   }
 }
 
