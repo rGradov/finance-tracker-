@@ -54,10 +54,11 @@ class UserPinCubit extends Cubit<UserPinState> {
     _loadPin();
     _localAuthCubitSubscription = localAuthCubit.stream.listen((state) {
       if(state is Authorized){
-        debugPrint('incorrect pin');
+        debugPrint('correct pin');
+
         emit(UserPinCorrect(repository.pin));
       }else {
-        debugPrint('correct pin');
+        debugPrint('incorrect pin');
         emit(const UserPinIncorrect('incorrect pin'));
       }
     });
