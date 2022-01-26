@@ -14,42 +14,71 @@ enum TextFieldType { password, email, repeatPassword }
 /// @example [0,1,2,3,4,5] 0 - fist 1,2,3,4 - middle, 5 -last
 enum TextFieldPosition { first, last, middle }
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
   @override
+  _SignUpScreenState createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  late ScrollController _controller;
+
+  @override
+  void initState() {
+    _controller = ScrollController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final _height = MediaQuery.of(context).size.height;
     return Scaffold(
       extendBody: true,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            TopNavigation(
-              headerText: 'Sign Up',
-              isBlack: true,
+        child: SingleChildScrollView(
+          controller: _controller,
+          child: SizedBox(
+            width: double.infinity,
+            height: _height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const TopNavigation(
+                  headerText: 'Sign Up',
+                  isBlack: true,
+                ),
+                const Spacer(
+                  flex: 1,
+                ),
+                Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _FormWrapper(
+                        controller: _controller,
+                      ),
+                    )),
+                const _PrivacyPoliceWrapper(),
+                const Expanded(
+                    flex: 3,
+                    child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: _SignUpButtonsWrapper())),
+                const Spacer(
+                  flex: 3,
+                ),
+              ],
             ),
-            Spacer(
-              flex: 1,
-            ),
-            Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: _FormWrapper(),
-                )),
-            _PrivacyPoliceWrapper(),
-            Expanded(
-                flex: 3,
-                child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: _SignUpButtonsWrapper())),
-            Spacer(
-              flex: 3,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -57,22 +86,28 @@ class SignUpScreen extends StatelessWidget {
 }
 
 class _FormWrapper extends StatelessWidget {
-  const _FormWrapper({Key? key}) : super(key: key);
+  final ScrollController controller;
+
+  const _FormWrapper({Key? key, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        _FieldWrapper(
+      children: [
+         _FieldWrapper(
           type: TextFieldType.email,
           position: TextFieldPosition.first,
+          controller: controller,
         ),
-        _FieldWrapper(
+         _FieldWrapper(
+           controller: controller,
             type: TextFieldType.password, position: TextFieldPosition.last),
         _FieldWrapper(
-            type: TextFieldType.repeatPassword,
-            position: TextFieldPosition.last),
+          type: TextFieldType.repeatPassword,
+          position: TextFieldPosition.last,
+          controller: controller,
+        ),
       ],
     );
   }
@@ -82,8 +117,10 @@ class _FormWrapper extends StatelessWidget {
 class _FieldWrapper extends StatefulWidget {
   final TextFieldType type;
   final TextFieldPosition position;
+  final ScrollController? controller;
 
-  const _FieldWrapper({Key? key, required this.type, required this.position})
+  const _FieldWrapper(
+      {Key? key, this.controller, required this.type, required this.position})
       : super(key: key);
 
   @override
@@ -93,6 +130,7 @@ class _FieldWrapper extends StatefulWidget {
 class _FieldWrapperState extends State<_FieldWrapper> {
   late TextEditingController _controller;
   bool _needShow = false;
+
   @override
   void initState() {
     _controller = TextEditingController();
@@ -107,50 +145,70 @@ class _FieldWrapperState extends State<_FieldWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => PasswordCubit(),
-      child: BlocConsumer<PasswordCubit, PasswordBlocState>(
-        listener:(_,state){
-          if(state is HidePassword){
-            _needShow = false;
-          }
-          if(state is ShowPassword){
-            _needShow = true;
-          }
-        },
-        builder:(_,state){
-          return TextField(
-            obscureText: widget.type == TextFieldType.repeatPassword ||
-                widget.type == TextFieldType.password?_needShow:_needShow,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: InputDecoration(
-              fillColor: AppColor.baseLight[60],
-              hoverColor: AppColor.baseLight[60],
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.violet[100]!, width: 2.0),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
-              suffixIcon: widget.type == TextFieldType.repeatPassword
-                  ? const _HideIcon()
-                  : const SizedBox(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            ),
-            minLines: 1,
-            maxLines: 1,
-            onChanged: (value) {},
-            controller: _controller,
-          );
+    return BlocProvider(
+      create: (_) => PasswordCubit(),
+      child:
+          BlocConsumer<PasswordCubit, PasswordBlocState>(listener: (_, state) {
+        if (state is HidePassword) {
+          _needShow = false;
         }
-      ),);
+        if (state is ShowPassword) {
+          _needShow = true;
+        }
+      }, builder: (_, state) {
+        return TextField(
+          obscureText: widget.type == TextFieldType.repeatPassword ||
+                  widget.type == TextFieldType.password
+              ? _needShow
+              : _needShow,
+          enableSuggestions: false,
+          autocorrect: false,
+          onTap: () {
+           if(widget.type == TextFieldType.email){
+             widget.controller?.animateTo(0,
+                 duration: const Duration(milliseconds: 250),
+                 curve: Curves.decelerate);
+           } else if (widget.type == TextFieldType.repeatPassword){
+             widget.controller?.animateTo(widget.controller!.position.maxScrollExtent,
+                 duration: const Duration(milliseconds: 250),
+                 curve: Curves.decelerate);
+           }else {
+             widget.controller?.animateTo(widget.controller!.position.maxScrollExtent/2,
+                 duration: const Duration(milliseconds: 250),
+                 curve: Curves.decelerate);
+           }
+          },
+          decoration: InputDecoration(
+            fillColor: AppColor.baseLight[60],
+            hoverColor: AppColor.baseLight[60],
+            enabledBorder: OutlineInputBorder(
+              borderSide:
+                  BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            border: OutlineInputBorder(
+              borderSide:
+                  BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColor.violet[100]!, width: 2.0),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
+            suffixIcon: widget.type == TextFieldType.repeatPassword
+                ? const _HideIcon()
+                : const SizedBox(),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          ),
+          minLines: 1,
+          maxLines: 1,
+          onChanged: (value) {},
+          controller: _controller,
+        );
+      }),
+    );
   }
 }
 
@@ -200,8 +258,7 @@ class _PrivacyText extends StatelessWidget {
           TextSpan(
               text: 'Terms of Service  and Privacy Policy',
               style: _linkStyle,
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {}),
+              recognizer: TapGestureRecognizer()..onTap = () {}),
         ],
       ),
     );
@@ -393,9 +450,11 @@ class _HideIcon extends StatelessWidget {
     return Transform.scale(
       scale: 0.6,
       child: GestureDetector(
-        onTap: ()=>_action.showPassword(),
+        onTap: () => _action.showPassword(),
         child: SvgPicture.asset(
-          AppIcons.show, color: Colors.black.withOpacity(0.2),),
+          AppIcons.show,
+          color: Colors.black.withOpacity(0.2),
+        ),
       ),
     );
   }
