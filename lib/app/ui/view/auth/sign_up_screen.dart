@@ -92,23 +92,27 @@ class _FormWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-         _FieldWrapper(
-          type: TextFieldType.email,
-          position: TextFieldPosition.first,
-          controller: controller,
-        ),
-         _FieldWrapper(
-           controller: controller,
-            type: TextFieldType.password, position: TextFieldPosition.last),
-        _FieldWrapper(
-          type: TextFieldType.repeatPassword,
-          position: TextFieldPosition.last,
-          controller: controller,
-        ),
-      ],
+    return BlocProvider(
+      create: (_) => PasswordCubit(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _FieldWrapper(
+            type: TextFieldType.email,
+            position: TextFieldPosition.first,
+            controller: controller,
+          ),
+          _FieldWrapper(
+              controller: controller,
+              type: TextFieldType.password,
+              position: TextFieldPosition.last),
+          _FieldWrapper(
+            type: TextFieldType.repeatPassword,
+            position: TextFieldPosition.last,
+            controller: controller,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -145,70 +149,63 @@ class _FieldWrapperState extends State<_FieldWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PasswordCubit(),
-      child:
-          BlocConsumer<PasswordCubit, PasswordBlocState>(listener: (_, state) {
-        if (state is HidePassword) {
-          _needShow = false;
-        }
-        if (state is ShowPassword) {
-          _needShow = true;
-        }
-      }, builder: (_, state) {
-        return TextField(
-          obscureText: widget.type == TextFieldType.repeatPassword ||
-                  widget.type == TextFieldType.password
-              ? _needShow
-              : _needShow,
-          enableSuggestions: false,
-          autocorrect: false,
-          onTap: () {
-           if(widget.type == TextFieldType.email){
-             widget.controller?.animateTo(0,
-                 duration: const Duration(milliseconds: 250),
-                 curve: Curves.decelerate);
-           } else if (widget.type == TextFieldType.repeatPassword){
-             widget.controller?.animateTo(widget.controller!.position.maxScrollExtent,
-                 duration: const Duration(milliseconds: 250),
-                 curve: Curves.decelerate);
-           }else {
-             widget.controller?.animateTo(widget.controller!.position.maxScrollExtent/2,
-                 duration: const Duration(milliseconds: 250),
-                 curve: Curves.decelerate);
-           }
-          },
-          decoration: InputDecoration(
-            fillColor: AppColor.baseLight[60],
-            hoverColor: AppColor.baseLight[60],
-            enabledBorder: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            border: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColor.violet[100]!, width: 2.0),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
-            suffixIcon: widget.type == TextFieldType.repeatPassword
-                ? const _HideIcon()
-                : const SizedBox(),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+    return BlocConsumer<PasswordCubit, PasswordBlocState>(listener: (_, state) {
+      if (state is HidePassword) {
+        _needShow = false;
+      }
+      if (state is ShowPassword) {
+        _needShow = true;
+      }
+    }, builder: (_, state) {
+      return TextField(
+        obscureText: _needShow && (widget.type == TextFieldType.password ||widget.type == TextFieldType.repeatPassword) ,
+        enableSuggestions: false,
+        autocorrect: false,
+        onTap: () {
+          if (widget.type == TextFieldType.email) {
+            widget.controller?.animateTo(0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.decelerate);
+          } else if (widget.type == TextFieldType.repeatPassword) {
+            widget.controller?.animateTo(
+                widget.controller!.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.decelerate);
+          } else {
+            widget.controller?.animateTo(
+                widget.controller!.position.maxScrollExtent / 2,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.decelerate);
+          }
+        },
+        decoration: InputDecoration(
+          fillColor: AppColor.baseLight[60],
+          hoverColor: AppColor.baseLight[60],
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+            borderRadius: BorderRadius.circular(16),
           ),
-          minLines: 1,
-          maxLines: 1,
-          onChanged: (value) {},
-          controller: _controller,
-        );
-      }),
-    );
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColor.baseLight[60]!, width: 2.0),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColor.violet[100]!, width: 2.0),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          hintText: widget.type == TextFieldType.email ? 'Email' : 'Password',
+          suffixIcon: widget.type == TextFieldType.repeatPassword
+              ? const _HideIcon()
+              : const SizedBox(),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        ),
+        minLines: 1,
+        maxLines: 1,
+        onChanged: (value) {},
+        controller: _controller,
+      );
+    });
   }
 }
 
