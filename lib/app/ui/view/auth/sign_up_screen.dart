@@ -39,49 +39,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final _height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          controller: _controller,
-          child: SizedBox(
-            width: double.infinity,
-            height: _height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const TopNavigation(
-                  headerText: 'Sign Up',
-                  isBlack: true,
+      /// REFACTOR THIS PART
+      return WillPopScope(
+        onWillPop: () async{
+          debugPrint('wil');
+          _controller.animateTo(0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.decelerate);
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+          return true;
+
+        },
+        child: Scaffold(
+          extendBody: true,
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              controller: _controller,
+              child: SizedBox(
+                width: double.infinity,
+                height: _height,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const TopNavigation(
+                      headerText: 'Sign Up',
+                      isBlack: true,
+                    ),
+                    const Spacer(
+                      flex: 1,
+                    ),
+                    Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _FormWrapper(
+                            controller: _controller,
+                          ),
+                        )),
+                    const _PrivacyPoliceWrapper(),
+                    const Expanded(
+                        flex: 3,
+                        child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: _SignUpButtonsWrapper())),
+                    const Spacer(
+                      flex: 3,
+                    ),
+                  ],
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
-                Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _FormWrapper(
-                        controller: _controller,
-                      ),
-                    )),
-                const _PrivacyPoliceWrapper(),
-                const Expanded(
-                    flex: 3,
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: _SignUpButtonsWrapper())),
-                const Spacer(
-                  flex: 3,
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -133,7 +148,7 @@ class _FieldWrapper extends StatefulWidget {
 
 class _FieldWrapperState extends State<_FieldWrapper> {
   late TextEditingController _controller;
-  bool _needShow = false;
+  bool _needShow = true;
 
   @override
   void initState() {
@@ -151,14 +166,16 @@ class _FieldWrapperState extends State<_FieldWrapper> {
   Widget build(BuildContext context) {
     return BlocConsumer<PasswordCubit, PasswordBlocState>(listener: (_, state) {
       if (state is HidePassword) {
-        _needShow = false;
+        _needShow = true;
       }
       if (state is ShowPassword) {
-        _needShow = true;
+        _needShow = false;
       }
     }, builder: (_, state) {
       return TextField(
-        obscureText: _needShow && (widget.type == TextFieldType.password ||widget.type == TextFieldType.repeatPassword) ,
+        obscureText: _needShow &&
+            (widget.type == TextFieldType.password ||
+                widget.type == TextFieldType.repeatPassword),
         enableSuggestions: false,
         autocorrect: false,
         onTap: () {
@@ -262,8 +279,15 @@ class _PrivacyText extends StatelessWidget {
   }
 }
 
-class _CheckBox extends StatelessWidget {
+class _CheckBox extends StatefulWidget {
   const _CheckBox({Key? key}) : super(key: key);
+
+  @override
+  __CheckBoxState createState() => __CheckBoxState();
+}
+
+class __CheckBoxState extends State<_CheckBox> {
+  bool isAgree = false;
 
   @override
   Widget build(BuildContext context) {
@@ -272,11 +296,16 @@ class _CheckBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
       ),
       activeColor: AppColor.violet[100],
-      checkColor: AppColor.violet[100],
+      checkColor: Colors.white,
       hoverColor: AppColor.violet[100],
       tristate: false,
-      value: false,
-      onChanged: (status) {},
+      value: isAgree,
+      onChanged: (status) {
+        if (status != null) {
+          isAgree = status;
+          setState(() {});
+        }
+      },
     );
   }
 }
