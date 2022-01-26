@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
+import 'package:finance_tracker/bloc/auth/local_auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -41,42 +44,54 @@ class UserPinIncorrect extends UserPinState with EquatableMixin {
 }
 
 class UserPinCubit extends Cubit<UserPinState> {
-  final UserRepo _repository;
+  final UserRepo repository;
+  final LocalAuthCubit localAuthCubit;
   String? _pinCode;
+  StreamSubscription? _localAuthCubitSubscription;
 
-  UserPinCubit(this._repository) : super(const UserPinEmpty()){
+  UserPinCubit({required this.repository,required this.localAuthCubit})
+      : super(const UserPinEmpty()) {
     _loadPin();
+    _localAuthCubitSubscription = localAuthCubit.stream.listen((state) {
+      if(state is Authorized){
+        debugPrint('incorrect pin');
+        emit(UserPinCorrect(repository.pin));
+      }else {
+        debugPrint('correct pin');
+        emit(const UserPinIncorrect('incorrect pin'));
+      }
+    });
   }
 
-  Future<void> _loadPin()async {
-   _pinCode = await _repository.loadPin();
-   debugPrint(_pinCode);
+  Future<void> _loadPin() async {
+    _pinCode = await repository.loadPin();
+    debugPrint(_pinCode);
   }
-  void onUserPinCodeIncrement(int pinCode) async{
-    _repository.incrementPin(pinCode);
-    emit(UserPinChanged(_repository.pin));
-    if (_repository.pin.length == 4) {
-      if(_pinCode !=null){
-        if(_pinCode == _repository.pin){
-          emit(UserPinCorrect(_repository.pin));
-        }else {
+
+  void onUserPinCodeIncrement(int pinCode) async {
+    repository.incrementPin(pinCode);
+    emit(UserPinChanged(repository.pin));
+    if (repository.pin.length == 4) {
+      if (_pinCode != null) {
+        if (_pinCode == repository.pin) {
+          emit(UserPinCorrect(repository.pin));
+        } else {
           debugPrint('pin is incorrect');
           emit(const UserPinIncorrect('incorrect pin'));
         }
-      }else {
-        await _repository.savePin(_repository.pin);
-        emit(UserPinCorrect(_repository.pin));
-
+      } else {
+        await repository.savePin(repository.pin);
+        emit(UserPinCorrect(repository.pin));
       }
     }
   }
-  void onUserPinDecrement(){
-    _repository.decrementPin();
-    if(_repository.pin.isEmpty){
-      emit(const UserPinEmpty());
-    }else {
-      emit(UserPinChanged(_repository.pin));
-    }
 
+  void onUserPinDecrement() {
+    repository.decrementPin();
+    if (repository.pin.isEmpty) {
+      emit(const UserPinEmpty());
+    } else {
+      emit(UserPinChanged(repository.pin));
+    }
   }
 }

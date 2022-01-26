@@ -17,33 +17,20 @@ class PinScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final LocalAuthRepository _repository = LocalAuthRepository();
     final double _screenHeight = ScreenSize().screenHeight;
-    final int flex = _screenHeight < 700 ? 1 : 2;
     return MultiBlocProvider(
-        providers: [
-        BlocProvider(
-          create: (_) => UserPinCubit(UserRepo()),
+      providers: [
+        BlocProvider<LocalAuthCubit>(
+          create: (_) => LocalAuthCubit(_repository)..checkAuth(),
           lazy: false,
         ),
-          BlocProvider<LocalAuthCubit>(
-            create: (_) => LocalAuthCubit(_repository)..checkAuth(),
-            lazy: false,
-          ),
-        ],
-        child: Scaffold(
-          backgroundColor: AppColor.violet[100],
-          body: SafeArea(
-            child: Column(
-              children: [
-                const Expanded(flex: 1, child: _Header()),
-                const Expanded(flex: 3, child: _PinCircles()),
-                Spacer(
-                  flex: flex,
-                ),
-                const Expanded(flex: 5, child: CustomNumberKeyboard()),
-              ],
-            ),
-          ),
-        ));
+      ],
+      child: Scaffold(
+        backgroundColor: AppColor.violet[100],
+        body: const SafeArea(
+          child: _BodyWrapper(),
+        ),
+      ),
+    );
     // return BlocProvider(
     //   create: (_) => UserPinCubit(UserRepo()),
     //   lazy: false,
@@ -51,6 +38,32 @@ class PinScreen extends StatelessWidget {
     // );
   }
 }
+
+class _BodyWrapper extends StatelessWidget {
+  const _BodyWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final int _flex = ScreenSize().screenHeight < 700 ? 1 : 2;
+    return  BlocProvider<UserPinCubit>(
+      create: (_) => UserPinCubit(
+        repository: UserRepo(),
+        localAuthCubit:BlocProvider.of<LocalAuthCubit>(context),
+      ),
+      child: Column(
+        children: [
+          const Expanded(flex: 1, child: _Header()),
+          const Expanded(flex: 3, child: _PinCircles()),
+          Spacer(
+            flex: _flex,
+          ),
+          const Expanded(flex: 5, child: CustomNumberKeyboard()),
+        ],
+      ),
+    );
+  }
+}
+
 
 /// this circles used for inputting pin code: in nutshell it work like this
 /// we click on one number button  => see fill circle if click on [ X ] remove

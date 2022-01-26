@@ -15,7 +15,7 @@ class LocalAuthRepository {
 
   bool get isAuthenticated => _isAuthenticated;
 
-  Future<void> auth() async {
+  Future<bool> auth() async {
     if (!_isProtectionEnabled) {
       try {
         _isAuthenticated = await _auth.authenticate(
@@ -26,5 +26,6 @@ class LocalAuthRepository {
         debugPrint(e.toString());
       }
     }
+    return _isAuthenticated;
   }
 }

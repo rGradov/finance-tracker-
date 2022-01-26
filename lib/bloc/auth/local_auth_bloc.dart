@@ -17,7 +17,13 @@ class LocalAuthCubit extends Cubit<LocalAutState> {
   LocalAuthCubit( this._repository) : super(const NotAuthorized());
 
   Future<void> checkAuth()async{
-    await _repository.auth();
+    final _isAuthenticated  = await _repository.auth();
+    if(_isAuthenticated){
+      return emit(const Authorized());
+    }else {
+      return emit(const NotAuthorized());
+
+    }
   }
 
 
