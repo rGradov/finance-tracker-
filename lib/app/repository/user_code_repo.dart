@@ -33,4 +33,7 @@ class UserRepo {
       _user = _user.copyWith(pinCode: _user.pinCode + num.toString());
     }
   }
+  void pastePin(String pin){
+    _user = _user.copyWith(pinCode: pin);
+  }
 }
