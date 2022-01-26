@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class UserPinState {
@@ -41,14 +42,32 @@ class UserPinIncorrect extends UserPinState with EquatableMixin {
 
 class UserPinCubit extends Cubit<UserPinState> {
   final UserRepo _repository;
+  String? _pinCode;
 
+  UserPinCubit(this._repository) : super(const UserPinEmpty()){
+    _loadPin();
+  }
 
-  UserPinCubit(this._repository) : super(const UserPinEmpty());
-  void onUserPinCodeIncrement(int pinCode) {
+  Future<void> _loadPin()async {
+   _pinCode = await _repository.loadPin();
+   debugPrint(_pinCode);
+  }
+  void onUserPinCodeIncrement(int pinCode) async{
     _repository.incrementPin(pinCode);
     emit(UserPinChanged(_repository.pin));
     if (_repository.pin.length == 4) {
-      emit(UserPinCorrect(_repository.pin));
+      if(_pinCode !=null){
+        if(_pinCode == _repository.pin){
+          emit(UserPinCorrect(_repository.pin));
+        }else {
+          debugPrint('pin is incorrect');
+          emit(const UserPinIncorrect('incorrect pin'));
+        }
+      }else {
+        await _repository.savePin(_repository.pin);
+        emit(UserPinCorrect(_repository.pin));
+
+      }
     }
   }
   void onUserPinDecrement(){

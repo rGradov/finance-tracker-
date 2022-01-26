@@ -11,6 +11,15 @@ class UserRepo {
 
   String get pin => _user.pinCode;
 
+  /// load password
+  Future<String?> loadPin()async {
+   final _data = await _secureDataProvider.readSecureData(key: SecureKeys.pinCode);
+    return _data;
+  }
+  Future<void> savePin(String pin)async{
+    await _secureDataProvider.writeSecureData(key: SecureKeys.pinCode, value: pin);
+  }
+
   void decrementPin() {
     if (_user.pinCode.isNotEmpty) {
       _user = _user.copyWith(
@@ -18,16 +27,6 @@ class UserRepo {
     }
   }
 
-  Future<String?> readPin() async {
-    final _pin =
-        await _secureDataProvider.readSecureData(key: SecureKeys.pinCode);
-    return _pin;
-  }
-
-  Future<void> writePin(String pin) async {
-    await _secureDataProvider.writeSecureData(
-        key: SecureKeys.pinCode, value: pin);
-  }
 
   void incrementPin(int num) {
     if (_user.pinCode.length <= 3) {
