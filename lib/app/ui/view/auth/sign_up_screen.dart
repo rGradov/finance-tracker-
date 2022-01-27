@@ -208,6 +208,12 @@ class _FieldWrapperState extends State<_FieldWrapper> {
                 curve: Curves.decelerate);
           }
         },
+        toolbarOptions: const ToolbarOptions(
+          copy: true,
+          cut: true,
+          paste: false,
+          selectAll: true,
+        ),
         decoration: InputDecoration(
           fillColor: AppColor.baseLight[60],
           hoverColor: AppColor.baseLight[60],
