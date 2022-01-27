@@ -1,12 +1,18 @@
 import 'package:finance_tracker/app/data_provider/secure_data_provider.dart';
 import 'package:finance_tracker/app/model/user_model.dart';
+import 'package:flutter/material.dart';
+enum FieldStatus {
+  valid,
+  inValid,
+  empty,
+}
 
 class UserRepo {
   final SecureDataProvider _secureDataProvider;
-  var _user = UserModel('');
-
+  var _user = const UserModel('','','');
   UserRepo() : _secureDataProvider = SecureDataProvider();
-
+  static final RegExp _emailReg = RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$');
+  static final RegExp _passwordReg = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
   UserModel get user => _user;
 
   String get pin => _user.pinCode;
@@ -36,4 +42,37 @@ class UserRepo {
   void pastePin(String pin){
     _user = _user.copyWith(pinCode: pin);
   }
+  FieldStatus updateEmail(String email){
+    if(_emailReg.hasMatch(email)){
+      debugPrint('email is valid');
+      _user = _user.copyWith(email: email);
+      return FieldStatus.valid;
+    }else {
+      debugPrint('email is in valid');
+      return FieldStatus.inValid;
+
+    }
+  }
+
+  FieldStatus updatePassword(String password){
+    if(_passwordReg.hasMatch(password)){
+      _user = _user.copyWith(password: password);
+      debugPrint('password is valid');
+      return FieldStatus.valid;
+    }else {
+      debugPrint('password is invalid');
+      return FieldStatus.inValid;
+    }
+  }
+  FieldStatus checkPassword(String password){
+    if(password == _user.password){
+      debugPrint('rePassword == password');
+      return FieldStatus.valid;
+    }else {
+      debugPrint('rePassword != password');
+
+      return FieldStatus.inValid;
+    }
+  }
+
 }

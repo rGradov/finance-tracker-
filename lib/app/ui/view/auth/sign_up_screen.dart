@@ -1,7 +1,9 @@
+import 'package:finance_tracker/app/repository/user_code_repo.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/bloc/auth/auth_bloc.dart';
 import 'package:finance_tracker/bloc/auth/password_bloc.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/gestures.dart';
@@ -39,20 +41,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final _height = MediaQuery.of(context).size.height;
-      /// REFACTOR THIS PART
-      return WillPopScope(
-        onWillPop: () async{
-          debugPrint('wil');
-          _controller.animateTo(0,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.decelerate);
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-          return true;
 
-        },
+    /// REFACTOR THIS PART
+    return WillPopScope(
+      onWillPop: () async {
+        debugPrint('wil');
+        _controller.animateTo(0,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.decelerate);
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+        return true;
+      },
+      child: BlocProvider(
+        create: (_) => SignUpCubit(UserRepo()),
         child: Scaffold(
           extendBody: true,
           resizeToAvoidBottomInset: false,
@@ -96,7 +100,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -107,6 +112,7 @@ class _FormWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _signUpCubit = BlocProvider.of<SignUpCubit>(context);
     return BlocProvider(
       create: (_) => PasswordCubit(),
       child: Column(
@@ -116,12 +122,15 @@ class _FormWrapper extends StatelessWidget {
             type: TextFieldType.email,
             position: TextFieldPosition.first,
             controller: controller,
+            action: _signUpCubit.updateEmail,
           ),
           _FieldWrapper(
               controller: controller,
               type: TextFieldType.password,
+              action: _signUpCubit.updatePassword,
               position: TextFieldPosition.last),
           _FieldWrapper(
+            action: _signUpCubit.updateRePassword,
             type: TextFieldType.repeatPassword,
             position: TextFieldPosition.last,
             controller: controller,
@@ -137,9 +146,12 @@ class _FieldWrapper extends StatefulWidget {
   final TextFieldType type;
   final TextFieldPosition position;
   final ScrollController? controller;
+  final void Function(String) action;
 
   const _FieldWrapper(
-      {Key? key, this.controller, required this.type, required this.position})
+      {Key? key, this.controller,
+        required this.action,
+        required this.type, required this.position})
       : super(key: key);
 
   @override
@@ -164,6 +176,7 @@ class _FieldWrapperState extends State<_FieldWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final _signUpCubit = BlocProvider.of<SignUpCubit>(context);
     return BlocConsumer<PasswordCubit, PasswordBlocState>(listener: (_, state) {
       if (state is HidePassword) {
         _needShow = true;
@@ -219,7 +232,7 @@ class _FieldWrapperState extends State<_FieldWrapper> {
         ),
         minLines: 1,
         maxLines: 1,
-        onChanged: (value) {},
+        onChanged: widget.action,
         controller: _controller,
       );
     });
@@ -335,11 +348,13 @@ class _SignUpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AnimatedOpacity(
+    final _signUpCubit = BlocProvider.of<SignUpCubit>(context);
+    return  AnimatedOpacity(
       opacity: 1,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       child: FillButton(
         needPadding: false,
+        action: _signUpCubit.signUpClick,
         text: 'Sign Up',
         routeName: AppRoutes.addedNewAccount,
       ),

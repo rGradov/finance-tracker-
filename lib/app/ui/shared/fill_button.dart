@@ -6,9 +6,11 @@ class FillButton extends StatelessWidget {
   final String routeName;
   final String text;
   final bool needPadding;
+  final void Function()? action;
 
   const FillButton(
       {Key? key,
+        this.action,
       required this.text,
       required this.routeName,
       this.needPadding = true})
@@ -22,7 +24,7 @@ class FillButton extends StatelessWidget {
         fontWeight: FontWeight.w600,
         fontSize: 18);
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, routeName),
+      onTap: action,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
