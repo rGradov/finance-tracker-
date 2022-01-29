@@ -1,5 +1,6 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/app/ui/view/auth/onboarding/onboarding_screen.dart';
 import 'package:finance_tracker/app/ui/view/auth/sign_up_screen.dart';
 import 'package:finance_tracker/app/ui/view/pin_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme:AppTheme.light,
       onGenerateRoute:mainNavigation.onGenerateRoute,
-      home:  const SignUpScreen(),
+      home:  const OnBoardingScreen(),
     );
   }
 }
