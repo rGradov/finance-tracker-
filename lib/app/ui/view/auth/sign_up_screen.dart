@@ -1,3 +1,5 @@
+import 'package:finance_tracker/analytics/analytics_repository.dart';
+import 'package:finance_tracker/app/repository/auth_repository.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
@@ -28,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void initState() {
+    AppAnalyticsRepository().screenTracking(AppRoutes.signUpRoute);/// TODO: remade that
     _controller = ScrollController();
     super.initState();
   }
@@ -56,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return true;
       },
       child: BlocProvider(
-        create: (_) => SignUpCubit(UserRepo()),
+        create: (_) => SignUpCubit(UserRepo(),AuthRepository()),
         child: Scaffold(
           extendBody: true,
           resizeToAvoidBottomInset: false,

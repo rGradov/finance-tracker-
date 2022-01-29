@@ -1,3 +1,4 @@
+import 'package:finance_tracker/analytics/analytics_repository.dart';
 import 'package:finance_tracker/app/data_provider/secure_data_provider.dart';
 import 'package:finance_tracker/app/model/user_model.dart';
 import 'package:flutter/material.dart';

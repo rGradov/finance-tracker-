@@ -1,3 +1,4 @@
+import 'package:finance_tracker/app/repository/auth_repository.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -29,8 +30,9 @@ class TermsISDisagree extends SingUpState {
 
 class SignUpCubit extends Cubit<SingUpState> {
   final UserRepo _userRepository;
-
-  SignUpCubit(this._userRepository) : super(const EmptyFields());
+  final AuthRepository _authRepository;
+  SignUpCubit(this._userRepository,this._authRepository) :
+        super(const EmptyFields());
   FieldStatus _emailState = FieldStatus.empty;
   FieldStatus _passwordState = FieldStatus.empty;
   FieldStatus _rePassword = FieldStatus.empty;
@@ -54,7 +56,7 @@ class SignUpCubit extends Cubit<SingUpState> {
     }
   }
 
-  void signUpClick() {
+  void signUpClick() async{
     if (_emailState == FieldStatus.empty) {
       emit(const FieldsIsInValid('email is empty'));
     } else if (_emailState == FieldStatus.inValid) {
@@ -78,7 +80,7 @@ class SignUpCubit extends Cubit<SingUpState> {
     }
     if (_emailState == FieldStatus.valid && _rePassword == FieldStatus.valid &&
         _passwordState == FieldStatus.valid){
-      print('everithing is valid');
+      await _authRepository.emailSignIn(email: _userRepository.user.email, password: _userRepository.user.password);
     }
   }
 }
