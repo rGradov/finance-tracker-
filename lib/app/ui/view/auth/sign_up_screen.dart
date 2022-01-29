@@ -105,10 +105,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-class _FormWrapper extends StatelessWidget {
+class _FormWrapper extends StatefulWidget {
   final ScrollController controller;
 
   const _FormWrapper({Key? key, required this.controller}) : super(key: key);
+
+  @override
+  __FormWrapperState createState() => __FormWrapperState();
+}
+
+class __FormWrapperState extends State<_FormWrapper> {
+
+ late final  FocusNode _emailFocus;
+ late final  FocusNode _passwordFocus;
+ late final  FocusNode _rePasswordFocus;
+
+ @override
+  void initState() {
+    _emailFocus = FocusNode();
+    _passwordFocus = FocusNode();
+    _rePasswordFocus = FocusNode();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _emailFocus.dispose();
+    _rePasswordFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,21 +146,26 @@ class _FormWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _FieldWrapper(
+            currentFocus: _emailFocus,
+            nextFocus: _passwordFocus,
             type: TextFieldType.email,
             position: TextFieldPosition.first,
-            controller: controller,
+            controller: widget.controller,
             action: _signUpCubit.updateEmail,
           ),
           _FieldWrapper(
-              controller: controller,
+              currentFocus: _passwordFocus,
+              nextFocus: _rePasswordFocus,
+              controller: widget.controller,
               type: TextFieldType.password,
               action: _signUpCubit.updatePassword,
               position: TextFieldPosition.last),
           _FieldWrapper(
+            currentFocus: _rePasswordFocus,
             action: _signUpCubit.updateRePassword,
             type: TextFieldType.repeatPassword,
             position: TextFieldPosition.last,
-            controller: controller,
+            controller: widget.controller,
           ),
         ],
       ),
@@ -144,13 +176,17 @@ class _FormWrapper extends StatelessWidget {
 /// use it to wrap all available field
 class _FieldWrapper extends StatefulWidget {
   final TextFieldType type;
+  final FocusNode currentFocus;
+  final FocusNode? nextFocus;
   final TextFieldPosition position;
   final ScrollController? controller;
   final void Function(String) action;
 
   const _FieldWrapper(
       {Key? key, this.controller,
+        required this.currentFocus,
         required this.action,
+        this.nextFocus,
         required this.type, required this.position})
       : super(key: key);
 
@@ -186,6 +222,7 @@ class _FieldWrapperState extends State<_FieldWrapper> {
       }
     }, builder: (_, state) {
       return TextField(
+        focusNode: widget.currentFocus,
         obscureText: _needShow &&
             (widget.type == TextFieldType.password ||
                 widget.type == TextFieldType.repeatPassword),
@@ -239,6 +276,15 @@ class _FieldWrapperState extends State<_FieldWrapper> {
         minLines: 1,
         maxLines: 1,
         onChanged: widget.action,
+        onSubmitted: (value){
+          widget.currentFocus.unfocus();
+          FocusScope.of(context).requestFocus(widget.nextFocus);
+          if(widget.nextFocus == null){
+            widget.controller?.animateTo(0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.decelerate);
+          }
+        },
         controller: _controller,
       );
     });
@@ -462,7 +508,7 @@ class _SignUpGoogleButton extends StatelessWidget {
     );
     return Container(
         constraints: const BoxConstraints(maxHeight: 80, minHeight: 60),
-        padding: const EdgeInsets.symmetric(vertical: 15),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.transparent,
@@ -473,7 +519,7 @@ class _SignUpGoogleButton extends StatelessWidget {
         ),
         child: FractionallySizedBox(
           alignment: Alignment.center,
-          widthFactor: 0.55,
+          widthFactor: 0.6,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
