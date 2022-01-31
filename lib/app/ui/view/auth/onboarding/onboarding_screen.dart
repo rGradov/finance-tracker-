@@ -81,17 +81,132 @@ class __OnBoardingBodyWrapperState extends State<_OnBoardingBodyWrapper> {
               itemCount: 3,
             ),
           ),
-          const Spacer(
+          Expanded(
             flex: 1,
+            child: _CircleDotAnimation(controller: _controller),
           ),
           Expanded(
               flex: 2,
               child: _OnBoardingButtonsWrapper(
                 controller: _controller,
               )),
-
         ],
       ),
+    );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+class _CircleDotAnimation extends StatefulWidget {
+  final PageController controller;
+
+  const _CircleDotAnimation({Key? key, required this.controller})
+      : super(key: key);
+
+  @override
+  _CircleDotAnimationState createState() => _CircleDotAnimationState();
+}
+
+class _CircleDotAnimationState extends State<_CircleDotAnimation>
+    with TickerProviderStateMixin {
+  late List<AnimationController> _controller;
+  late List<Animation<Offset>> _animation = [];
+  final ValueNotifier<int> _index = ValueNotifier(0);
+
+  @override
+  void initState() {
+    _controller = List.generate(
+        3,
+        (index) => AnimationController(
+              vsync: this,
+              duration: const Duration(milliseconds: 250),
+            ));
+    _animation = List.generate(
+        3,
+        (index) => Tween<Offset>(
+              begin:  Offset(index*36, 0),
+              end: Offset((index * 36) + 36, 0),
+            ).animate(_controller[index]));
+
+    widget.controller.addListener(_listener);
+    super.initState();
+  }
+  
+  @override
+  void dispose() {
+    for (var controller in _controller) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _listener() {
+    debugPrint(widget.controller.page.toString());
+    if (widget.controller.page! > 0) {
+      if (!_controller[0].isAnimating) {
+        _controller[0].forward();
+      } if (_controller[0].isCompleted){
+        _index.value = 1;
+      }
+    }
+    if (widget.controller.page! > 1.00) {
+      debugPrint(_controller[1].isAnimating.toString());
+      if (!_controller[1].isAnimating) {
+        _controller[1].forward();
+      }  if(_controller[1].isCompleted){
+        _index.value =2;
+      }
+    } if (widget.controller.page! > 2.00) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+        widthFactor: 0.2,
+        alignment: Alignment.center,
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            Align(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(3, (index) => const _CircleDot()),
+              ),
+            ),
+            ValueListenableBuilder<int>(
+                valueListenable: _index,
+                builder: (_, value, __) {
+                  return AnimatedBuilder(
+                      animation: _animation[value],
+                      builder: (_, __) {
+                        return Transform.translate(
+                          offset: _animation[value].value,
+                          child: Transform.scale(
+                            scale:_controller[value].isAnimating? 1.25:1.0,
+                            child: const _CircleDot(
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      });
+                }),
+          ],
+        ));
+  }
+}
+
+class _CircleDot extends StatelessWidget {
+  final Color? color;
+
+  const _CircleDot({Key? key, this.color}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      backgroundColor: color ?? Colors.black,
+      radius: 5,
     );
   }
 }
@@ -110,10 +225,10 @@ class _OnBoardingElement extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          flex: 2,
+            flex: 2,
             child: _OnBoardingImg(
-          idx: idx,
-        )),
+              idx: idx,
+            )),
         Expanded(
             child: _OnBoardingText(
           idx: idx,
@@ -212,8 +327,10 @@ enum FillButtonStatus {
 }
 
 class _OnBoardingButtonsWrapper extends StatelessWidget {
-  final PageController  controller;
-  const _OnBoardingButtonsWrapper({Key? key,required this.controller}) : super(key: key);
+  final PageController controller;
+
+  const _OnBoardingButtonsWrapper({Key? key, required this.controller})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -224,9 +341,10 @@ class _OnBoardingButtonsWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _OnBoardingFillButton(controller: controller,),
+          _OnBoardingFillButton(
+            controller: controller,
+          ),
           const _OnBoardingLoginButton(),
-
         ],
       ),
     );
@@ -239,12 +357,14 @@ class _OnBoardingLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FillButton(
-      textColor:AppColor.violet[100]!,
-        color: AppColor.violet[20],
-        routeName: AppRoutes.loginRoute,
-        text: 'Log in', action: (){
+      textColor: AppColor.violet[100]!,
+      color: AppColor.violet[20],
+      routeName: AppRoutes.loginRoute,
+      text: 'Log in',
+      action: () {
         Navigator.pushNamed(context, AppRoutes.loginRoute);
-    },);
+      },
+    );
   }
 }
 
