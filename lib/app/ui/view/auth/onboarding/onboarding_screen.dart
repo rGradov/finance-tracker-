@@ -5,6 +5,8 @@ import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
 
+
+const DURATION =Duration(milliseconds: 600);
 const List<String> HEADERS = [
   'Gain total control of your money',
   'Know where your money goes',
@@ -121,7 +123,7 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
         3,
         (index) => AnimationController(
               vsync: this,
-              duration: const Duration(milliseconds: 250),
+              duration: DURATION,
             ));
     _animation = List.generate(
         3,
@@ -402,7 +404,7 @@ class __OnBoardingFillButtonState extends State<_OnBoardingFillButton> {
       action: () {
         if (_status == FillButtonStatus.next) {
           widget.controller.animateToPage(widget.controller.page!.floor() + 1,
-              duration: const Duration(milliseconds: 250),
+              duration: DURATION,
               curve: Curves.decelerate);
         } else {
           Navigator.pushNamed(context, AppRoutes.signUpRoute);
