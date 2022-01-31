@@ -6,11 +6,15 @@ class FillButton extends StatelessWidget {
   final String routeName;
   final String text;
   final bool needPadding;
+  final Color? color;
+  final Color? textColor;
   final void Function()? action;
 
   const FillButton(
       {Key? key,
         this.action,
+        this.textColor,
+        this.color,
       required this.text,
       required this.routeName,
       this.needPadding = true})
@@ -19,7 +23,7 @@ class FillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _style = TextStyle(
-        color: AppColor.baseLight[80],
+        color: textColor??AppColor.baseLight[80],
         fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 18);
@@ -31,7 +35,7 @@ class FillButton extends StatelessWidget {
           Container(
             constraints: const BoxConstraints(maxHeight: 60),
             decoration: BoxDecoration(
-              color: AppColor.violet[100]!,
+              color:color?? AppColor.violet[100]!,
               borderRadius: const BorderRadius.all(
                 Radius.circular(20),
               ),
