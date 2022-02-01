@@ -281,7 +281,24 @@ class _OnBoardingElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final _orientation = MediaQuery.of(context).orientation;
+    return
+      _orientation == Orientation.landscape?
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+              child: _OnBoardingImg(
+                idx: idx,
+              )),
+          Expanded(
+              child: _OnBoardingText(
+                idx: idx,
+              )),
+        ],
+      ):
+      Column(
       children: [
         Expanded(
             flex: 2,
@@ -319,6 +336,7 @@ class _OnBoardingText extends StatelessWidget {
       widthFactor: 0.7,
       alignment: Alignment.center,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _OnBoardingHeader(
             text: HEADERS[idx],
@@ -393,10 +411,26 @@ class _OnBoardingButtonsWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _orientation = MediaQuery.of(context).orientation;
     return FractionallySizedBox(
       widthFactor: 0.95,
       alignment: Alignment.center,
-      child: Column(
+      child:
+      _orientation == Orientation.landscape?
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: _OnBoardingFillButton(
+              controller: controller,
+            ),
+          ),
+          const SizedBox(width: 20,),
+          const  Expanded(child: _OnBoardingLoginButton()),
+        ],
+      ):
+      Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
