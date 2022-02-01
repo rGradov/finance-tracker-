@@ -171,12 +171,11 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [
-            Align(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(3, (index) => const _CircleDot()),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(3, (index) =>  _CircleDot(color: AppColor.violet[20],)),
             ),
+            /// FIXME: change to basic setState
             ValueListenableBuilder<int>(
                 valueListenable: _index,
                 builder: (_, value, __) {
@@ -187,8 +186,8 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
                           offset: _animation[value].value,
                           child: Transform.scale(
                             scale:_controller[value].isAnimating? 1.25:1.0,
-                            child: const _CircleDot(
-                              color: Colors.red,
+                            child:  _CircleDot(
+                              color: AppColor.violet[100],
                             ),
                           ),
                         );
@@ -413,5 +412,4 @@ class __OnBoardingFillButtonState extends State<_OnBoardingFillButton> {
     );
   }
 
-  void _action() {}
 }
