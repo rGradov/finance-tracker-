@@ -500,7 +500,7 @@ class __OnBoardingFillButtonState extends State<_OnBoardingFillButton> {
           widget.controller.animateToPage(widget.controller.page!.floor() + 1,
               duration: DURATION, curve: Curves.decelerate);
         } else {
-          getIt<NavigationService>().mainNavigateTo(name: AppRoutes.signUpRoute);
+          getIt<NavigationService>().mainNavigateTo(name: AppRoutes.loginRoute);
         }
       },
     );

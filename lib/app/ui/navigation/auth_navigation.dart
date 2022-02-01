@@ -5,9 +5,9 @@ import 'package:finance_tracker/app/ui/view/auth/verification/verification_scree
 import 'package:flutter/material.dart';
 
 abstract class AuthRouteNames{
-  static const String verificationRoute = 'auth/verification';
-  static const String loginRoute = 'auth/login';
-  static const String initialRoute = 'auth/signup';
+  static const String verificationRoute = 'verification';
+  static const String loginRoute = 'login';
+  static const String initialRoute = 'signUp';
 
 }
 class AuthNavigation {
@@ -20,6 +20,7 @@ class AuthNavigation {
         AuthRouteNames.verificationRoute: (_) => const VerificationScreen(),
       };
   Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+
     switch(settings.name){
       case AuthRouteNames.loginRoute:
         return _routeUtils.sharedAxisTransition(
@@ -29,7 +30,7 @@ class AuthNavigation {
         return _routeUtils.sharedAxisTransition(
             screen: const  SignUpScreen(),
             settings: settings);
-      case AppRoutes.verificationRoute:
+      case AuthRouteNames.verificationRoute:
         return _routeUtils.sharedAxisTransition(
             screen: const  VerificationScreen(),
             settings: settings);

@@ -1,12 +1,14 @@
 import 'package:finance_tracker/analytics/analytics_repository.dart';
 import 'package:finance_tracker/app/repository/auth_repository.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
+import 'package:finance_tracker/app/ui/navigation/auth_navigation.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
-import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
+import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/bloc/auth/auth_bloc.dart';
 import 'package:finance_tracker/bloc/auth/password_bloc.dart';
+import 'package:finance_tracker/main.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void initState() {
-    AppAnalyticsRepository().screenTracking(AppRoutes.signUpRoute);/// TODO: remade that
+    AppAnalyticsRepository().screenTracking(AppRoutes.loginRoute);/// TODO: remade that
     _controller = ScrollController();
     super.initState();
   }
@@ -46,19 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final _height = MediaQuery.of(context).size.height;
 
     /// REFACTOR THIS PART
-    return WillPopScope(
-      onWillPop: () async {
-        debugPrint('wil');
-        _controller.animateTo(0,
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.decelerate);
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-        return true;
-      },
-      child: BlocProvider(
+    return BlocProvider(
         create: (_) => SignUpCubit(UserRepo(),AuthRepository()),
         child: Scaffold(
           extendBody: true,
@@ -73,10 +63,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const TopNavigation(
-                      headerText: 'Sign Up',
-                      isBlack: true,
-                    ),
                     const Spacer(
                       flex: 1,
                     ),
@@ -102,8 +88,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ),
-        ),
-      ),
+        )
     );
   }
 }
@@ -411,7 +396,7 @@ class _SignUpButton extends StatelessWidget {
         needPadding: false,
         action:(){
           _signUpCubit.signUpClick;
-          Navigator.pushNamed(context, AppRoutes.verificationRoute);
+          getIt<NavigationService>().authNavigateTo(name: AuthRouteNames.verificationRoute);
         },
         text: 'Sign Up',
         routeName: AppRoutes.addedNewAccount,
