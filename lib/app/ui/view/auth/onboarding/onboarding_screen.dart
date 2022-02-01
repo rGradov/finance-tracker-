@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:finance_tracker/analytics/analytics_repository.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
@@ -5,8 +7,8 @@ import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
 
-
-const DURATION =Duration(milliseconds: 600);
+const DURATION = Duration(milliseconds: 600);
+const RADIUS = 18;
 const List<String> HEADERS = [
   'Gain total control of your money',
   'Know where your money goes',
@@ -114,8 +116,9 @@ class _CircleDotAnimation extends StatefulWidget {
 class _CircleDotAnimationState extends State<_CircleDotAnimation>
     with TickerProviderStateMixin {
   late List<AnimationController> _controller;
-  late List<Animation<Offset>> _animation = [];
+  late List<Animation<double>> _animation = [];
   final ValueNotifier<int> _index = ValueNotifier(0);
+  final ValueNotifier<int> _circleIndex = ValueNotifier(0);
 
   @override
   void initState() {
@@ -127,15 +130,30 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
             ));
     _animation = List.generate(
         3,
-        (index) => Tween<Offset>(
-              begin:  Offset(index*36, 0),
-              end: Offset((index * 36) + 36, 0),
+        (index) => Tween<double>(
+              begin: index % 2 == 0 ? 180 : -180,
+              end: 0,
             ).animate(_controller[index]));
 
     widget.controller.addListener(_listener);
+    for(var controller in _controller){
+      controller.addListener(_controllerListener);
+    }
     super.initState();
   }
-  
+
+  void _controllerListener(){
+    if(_controller[0].isAnimating){}
+    if(_controller[0].isCompleted){
+      _circleIndex.value = 1;
+    }
+    if(_controller[1].isCompleted){
+      _circleIndex.value = 2;
+    }
+  }
+
+
+
   @override
   void dispose() {
     for (var controller in _controller) {
@@ -144,70 +162,114 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
     super.dispose();
   }
 
+
   void _listener() {
     debugPrint(widget.controller.page.toString());
     if (widget.controller.page! > 0) {
       if (!_controller[0].isAnimating) {
         _controller[0].forward();
-      } if (_controller[0].isCompleted){
+      }
+      if (_controller[0].isCompleted) {
         _index.value = 1;
+        debugPrint('complite');
+
       }
     }
     if (widget.controller.page! > 1.00) {
+      if(_circleIndex.value !=1){
+      }
       debugPrint(_controller[1].isAnimating.toString());
       if (!_controller[1].isAnimating) {
         _controller[1].forward();
-      }  if(_controller[1].isCompleted){
-        _index.value =2;
       }
-    } if (widget.controller.page! > 2.00) {}
+      if (_controller[1].isCompleted) {
+        _index.value = 2;
+
+      }
+    }
+    if (widget.controller.page! > 2.00) {
+      _circleIndex.value = 2;
+      if(_circleIndex.value !=2){
+        // _circleIndex.value = 2;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-        widthFactor: 0.2,
-        alignment: Alignment.center,
-        child: Stack(
+    return SizedBox(
+      width: RADIUS*3*2,
+      height: RADIUS*3*2,
+      child: ValueListenableBuilder(valueListenable: _circleIndex,builder: (_,circleIndex,__){
+        return Stack(
           alignment: Alignment.centerLeft,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(3, (index) =>  _CircleDot(color: AppColor.violet[20],)),
+              children: List.generate(
+                  3,
+                      (index) =>Expanded(
+                    child:  _CircleDot(
+                      color: AppColor.violet[20],
+                    ),
+                  )),
             ),
+
             /// FIXME: change to basic setState
-            ValueListenableBuilder<int>(
-                valueListenable: _index,
-                builder: (_, value, __) {
-                  return AnimatedBuilder(
-                      animation: _animation[value],
-                      builder: (_, __) {
-                        return Transform.translate(
-                          offset: _animation[value].value,
-                          child: Transform.scale(
-                            scale:_controller[value].isAnimating? 1.25:1.0,
-                            child:  _CircleDot(
-                              color: AppColor.violet[100],
-                            ),
-                          ),
-                        );
-                      });
-                }),
+            Row(
+                children: List.generate(
+                  3,
+                      (index) => ValueListenableBuilder<int>(
+                      valueListenable: _index,
+                      builder: (_, value, __) {
+                        return AnimatedBuilder(
+                            animation: _animation[index],
+                            builder: (_, __) {
+                              final _angle = _animation[index].value.floor();
+                              final _offset = Offset(
+                                  RADIUS+18 * math.cos(_angle * (math.pi / 180)),
+                                  RADIUS * math.sin(_angle * (math.pi / 180)));
+                              return Expanded(
+                                child: Transform.translate(
+                                  offset: _offset,
+                                  child: Transform.scale(
+                                    scale:
+                                    _controller[index].isAnimating ? 1.25 : 1.0,
+                                    child: AnimatedOpacity(
+                                      duration: const Duration(milliseconds: 0),
+                                      opacity: 1,
+                                      child: _CircleDot(
+                                          animatedCircle: true,
+                                          color: circleIndex== index? AppColor.violet[100]:AppColor.violet[20]
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                      }),
+                )),
           ],
-        ));
+        );
+      },),
+    );
   }
 }
 
 class _CircleDot extends StatelessWidget {
   final Color? color;
+  final bool animatedCircle;
 
-  const _CircleDot({Key? key, this.color}) : super(key: key);
+  const _CircleDot({Key? key, this.animatedCircle = false,this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      backgroundColor: color ?? Colors.black,
-      radius: 5,
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color ?? Colors.black,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }
@@ -403,13 +465,11 @@ class __OnBoardingFillButtonState extends State<_OnBoardingFillButton> {
       action: () {
         if (_status == FillButtonStatus.next) {
           widget.controller.animateToPage(widget.controller.page!.floor() + 1,
-              duration: DURATION,
-              curve: Curves.decelerate);
+              duration: DURATION, curve: Curves.decelerate);
         } else {
           Navigator.pushNamed(context, AppRoutes.signUpRoute);
         }
       },
     );
   }
-
 }
