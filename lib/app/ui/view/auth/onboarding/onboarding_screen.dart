@@ -231,16 +231,12 @@ class _CircleDotAnimationState extends State<_CircleDotAnimation>
                               return Expanded(
                                 child: Transform.translate(
                                   offset: _offset,
-                                  child: Transform.scale(
-                                    scale:
-                                    _controller[index].isAnimating ? 1.25 : 1.0,
-                                    child: AnimatedOpacity(
-                                      duration: const Duration(milliseconds: 0),
-                                      opacity: 1,
-                                      child: _CircleDot(
-                                          animatedCircle: true,
-                                          color: circleIndex== index? AppColor.violet[100]:AppColor.violet[20]
-                                      ),
+                                  child: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 0),
+                                    opacity: circleIndex!= index?0:1,
+                                    child: _CircleDot(
+                                        animatedCircle: true,
+                                        color: circleIndex== index? AppColor.violet[100]:AppColor.violet[20]
                                     ),
                                   ),
                                 ),
