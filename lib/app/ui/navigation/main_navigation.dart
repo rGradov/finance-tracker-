@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:finance_tracker/app/ui/view/added_new_account.dart';
 import 'package:finance_tracker/app/ui/view/auth/auth_screen.dart';
 import 'package:finance_tracker/app/ui/view/auth/sign_up_screen.dart';
+import 'package:finance_tracker/app/ui/view/auth/verification/verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/app/ui/view/pin_screen.dart';
 import 'package:finance_tracker/app/ui/view/setup_account_screen.dart';
@@ -13,6 +14,7 @@ abstract class AppRoutes {
   static const addedNewAccount = '/setup/add';
   static const signUpRoute = 'auth/signUp';
   static const loginRoute = 'auth/login';
+  static const verificationRoute = 'auth/verification';
 
 }
 class MainNavigation {
@@ -46,6 +48,10 @@ class MainNavigation {
       case AppRoutes.signUpRoute:
         return _routeUtils.sharedAxisTransition(
             screen: const  SignUpScreen(),
+            settings: settings);
+      case AppRoutes.verificationRoute:
+        return _routeUtils.sharedAxisTransition(
+            screen: const  VerificationScreen(),
             settings: settings);
 
     }

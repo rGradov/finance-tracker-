@@ -1,7 +1,7 @@
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class FillButton extends StatelessWidget {
+class FillButton extends StatefulWidget {
   /// FIXME: change my name ( next route)
   final String routeName;
   final String text;
@@ -12,42 +12,49 @@ class FillButton extends StatelessWidget {
 
   const FillButton(
       {Key? key,
-        this.action,
-        this.textColor,
-        this.color,
+      this.action,
+      this.textColor,
+      this.color,
       required this.text,
       required this.routeName,
       this.needPadding = true})
       : super(key: key);
 
   @override
+  _FillButtonState createState() => _FillButtonState();
+}
+
+/// FIXME: added did update
+
+class _FillButtonState extends State<FillButton> {
+  @override
   Widget build(BuildContext context) {
     final _style = TextStyle(
-        color: textColor??AppColor.baseLight[80],
+        color: widget.textColor ?? AppColor.baseLight[80],
         fontFamily: 'Inter',
         fontWeight: FontWeight.w600,
         fontSize: 18);
     return GestureDetector(
-      onTap: action,
+      onTap: widget.action,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
             constraints: const BoxConstraints(maxHeight: 60),
             decoration: BoxDecoration(
-              color:color?? AppColor.violet[100]!,
+              color: widget.color ?? AppColor.violet[100]!,
               borderRadius: const BorderRadius.all(
                 Radius.circular(20),
               ),
             ),
             child: Center(
               child: Text(
-                text,
+                widget.text,
                 style: _style,
               ),
             ),
           ),
-          needPadding
+          widget.needPadding
               ? const SizedBox(
                   height: 30,
                 )

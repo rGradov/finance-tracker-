@@ -409,7 +409,10 @@ class _SignUpButton extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       child: FillButton(
         needPadding: false,
-        action: _signUpCubit.signUpClick,
+        action:(){
+          _signUpCubit.signUpClick;
+          Navigator.pushNamed(context, AppRoutes.verificationRoute);
+        },
         text: 'Sign Up',
         routeName: AppRoutes.addedNewAccount,
       ),

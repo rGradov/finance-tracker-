@@ -2,10 +2,13 @@ import 'dart:math' as math;
 
 import 'package:finance_tracker/analytics/analytics_repository.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/main.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 const DURATION = Duration(milliseconds: 600);
 const RADIUS = 18;
@@ -497,7 +500,7 @@ class __OnBoardingFillButtonState extends State<_OnBoardingFillButton> {
           widget.controller.animateToPage(widget.controller.page!.floor() + 1,
               duration: DURATION, curve: Curves.decelerate);
         } else {
-          Navigator.pushNamed(context, AppRoutes.signUpRoute);
+          getIt<NavigationService>().mainNavigateTo(name: AppRoutes.signUpRoute);
         }
       },
     );
