@@ -2,11 +2,10 @@ import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
-import 'package:finance_tracker/app/view_model/added_new_wallet_vm.dart';
-import 'package:finance_tracker/resources/resources.dart';
+import 'package:finance_tracker/bloc/wallet/wallet_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Header == Navigation arrow? and Name
 ///
@@ -24,9 +23,11 @@ class AddedNewAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_)=>AddedNewWalletViewModel(),
+    return BlocProvider(
+      create: (_) => NewWalletCubit(const InitialState()),
       child: Scaffold(
+        extendBody: true,
+        resizeToAvoidBottomInset: false,
         backgroundColor: AppColor.violet[100]!,
         body: SafeArea(
           child: SizedBox.expand(
@@ -37,10 +38,11 @@ class AddedNewAccountScreen extends StatelessWidget {
                 TopNavigation(
                   headerText: 'Added new wallet',
                 ),
-                Spacer(flex: 6),
                 _BalanceInput(),
+                Spacer(flex: 5,),
                 SizedBox(height: 20),
                 Expanded(flex: 5, child: _InputWalletData()),
+                _AnimatedBodyWrapper(),
               ],
             ),
           ),
@@ -50,9 +52,33 @@ class AddedNewAccountScreen extends StatelessWidget {
   }
 }
 
+class _AnimatedBodyWrapper extends StatefulWidget {
+  const _AnimatedBodyWrapper({Key? key}) : super(key: key);
 
+  @override
+  State<_AnimatedBodyWrapper> createState() => _AnimatedBodyWrapperState();
+}
 
+class _AnimatedBodyWrapperState extends State<_AnimatedBodyWrapper> {
+  bool _keyboardIsOpen = false;
 
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<NewWalletCubit, AddedNewWalletState>(
+        builder: (_, state) {
+      return AnimatedContainer(
+          width: double.infinity,
+          height: _keyboardIsOpen ? 250 : 0,
+          alignment: Alignment.bottomCenter,
+          duration: const Duration(microseconds: 250),
+          child: const SizedBox.expand());
+    }, listener: (_, state) {
+      if (state is KeyboardIsOpened) {
+        _keyboardIsOpen = true;
+      }
+    });
+  }
+}
 
 /// FIXME: change my name ( make it more better )
 /// it should be rounded container with dropdown and inputted field
@@ -66,23 +92,25 @@ class _InputWalletData extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            _InputWalletName(),
-            _DropDownAccountType(),
-            _ContinueButton(),
-
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        child: ConstrainedBox(
+          constraints:const BoxConstraints(minHeight: 200),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              _InputWalletName(),
+              _DropDownAccountType(),
+              _ContinueButton(),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 class _DropDownAccountType extends StatefulWidget {
   const _DropDownAccountType({Key? key}) : super(key: key);
 
@@ -98,14 +126,19 @@ class _DropDownAccountTypeState extends State<_DropDownAccountType> {
     _controller = TextEditingController();
     super.initState();
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
+    final _walletCubit = BlocProvider.of<NewWalletCubit>(context);
+
     return TextField(
+      onTap: () => _walletCubit.onTextFieldTap(),
       controller: _controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(
@@ -113,7 +146,7 @@ class _DropDownAccountTypeState extends State<_DropDownAccountType> {
         ),
         fillColor: Colors.green,
         filled: false,
-        hintStyle: const TextStyle(color: Colors.blue,fontSize: 12),
+        hintStyle: const TextStyle(color: Colors.blue, fontSize: 12),
         hintText: 'name',
       ),
     );
@@ -166,10 +199,8 @@ class _ContinueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool showButton = context
-        .select((AddedNewWalletViewModel vm) => vm.continueButtonIsVisible);
     return AnimatedOpacity(
-      opacity: showButton ? 1 : 0.5,
+      opacity: true ? 1 : 0.5,
       duration: const Duration(milliseconds: 250),
       child: const FillButton(
         text: 'continue',

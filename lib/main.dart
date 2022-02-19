@@ -10,11 +10,12 @@ GetIt getIt = GetIt.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  /// Service locator
+
   getIt.registerSingleton<NavigationService>(
     NavigationService(),
   );
 
-  /// Service locator
   final MyApp app = MyApp();
   runApp(app);
 }

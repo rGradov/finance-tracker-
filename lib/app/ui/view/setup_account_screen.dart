@@ -1,7 +1,10 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:flutter/material.dart';
+
+import '../../../main.dart';
 
 class SetupAccountScreen extends StatelessWidget {
   const SetupAccountScreen({Key? key}) : super(key: key);
@@ -90,6 +93,10 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FillButton(text: text, routeName: AppRoutes.addedNewAccount);
+    return FillButton(
+        text: text,
+        action: () => getIt<NavigationService>()
+            .mainNavigateTo(name: AppRoutes.addedNewAccount),
+        routeName: AppRoutes.addedNewAccount);
   }
 }

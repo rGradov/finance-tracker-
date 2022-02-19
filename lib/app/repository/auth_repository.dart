@@ -24,6 +24,11 @@ class AuthRepository implements AuthIRepository{
           email: email,
           password: password
       );
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user!= null && !user.emailVerified) {
+        await user.sendEmailVerification();
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         debugPrint('The password provided is too weak.');

@@ -1,7 +1,6 @@
 import 'package:finance_tracker/analytics/analytics_repository.dart';
 import 'package:finance_tracker/app/repository/auth_repository.dart';
 import 'package:finance_tracker/app/repository/user_code_repo.dart';
-import 'package:finance_tracker/app/ui/navigation/auth_navigation.dart';
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
 import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
@@ -32,7 +31,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void initState() {
-    AppAnalyticsRepository().screenTracking(AppRoutes.loginRoute);/// TODO: remade that
+    AppAnalyticsRepository().screenTracking(AppRoutes.loginRoute);
+
+    /// TODO: remade that
     _controller = ScrollController();
     super.initState();
   }
@@ -49,7 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     /// REFACTOR THIS PART
     return BlocProvider(
-        create: (_) => SignUpCubit(UserRepo(),AuthRepository()),
+        create: (_) => SignUpCubit(UserRepo(), AuthRepository()),
         child: Scaffold(
           extendBody: true,
           resizeToAvoidBottomInset: false,
@@ -88,8 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ),
-        )
-    );
+        ));
   }
 }
 
@@ -103,12 +103,11 @@ class _FormWrapper extends StatefulWidget {
 }
 
 class __FormWrapperState extends State<_FormWrapper> {
+  late final FocusNode _emailFocus;
+  late final FocusNode _passwordFocus;
+  late final FocusNode _rePasswordFocus;
 
- late final  FocusNode _emailFocus;
- late final  FocusNode _passwordFocus;
- late final  FocusNode _rePasswordFocus;
-
- @override
+  @override
   void initState() {
     _emailFocus = FocusNode();
     _passwordFocus = FocusNode();
@@ -123,7 +122,6 @@ class __FormWrapperState extends State<_FormWrapper> {
     _passwordFocus.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +169,13 @@ class _FieldWrapper extends StatefulWidget {
   final void Function(String) action;
 
   const _FieldWrapper(
-      {Key? key, this.controller,
-        required this.currentFocus,
-        required this.action,
-        this.nextFocus,
-        required this.type, required this.position})
+      {Key? key,
+      this.controller,
+      required this.currentFocus,
+      required this.action,
+      this.nextFocus,
+      required this.type,
+      required this.position})
       : super(key: key);
 
   @override
@@ -264,10 +264,10 @@ class _FieldWrapperState extends State<_FieldWrapper> {
         minLines: 1,
         maxLines: 1,
         onChanged: widget.action,
-        onSubmitted: (value){
+        onSubmitted: (value) {
           widget.currentFocus.unfocus();
           FocusScope.of(context).requestFocus(widget.nextFocus);
-          if(widget.nextFocus == null){
+          if (widget.nextFocus == null) {
             widget.controller?.animateTo(0,
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.decelerate);
@@ -389,15 +389,13 @@ class _SignUpButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _signUpCubit = BlocProvider.of<SignUpCubit>(context);
-    return  AnimatedOpacity(
+    return AnimatedOpacity(
       opacity: 1,
       duration: const Duration(milliseconds: 300),
       child: FillButton(
         needPadding: false,
-        action:(){
-          _signUpCubit.signUpClick;
-          getIt<NavigationService>().authNavigateTo(name: AuthRouteNames.verificationRoute);
-        },
+        action: () => getIt<NavigationService>()
+            .mainNavigateTo(name: AppRoutes.setupAccountRoute),
         text: 'Sign Up',
         routeName: AppRoutes.addedNewAccount,
       ),

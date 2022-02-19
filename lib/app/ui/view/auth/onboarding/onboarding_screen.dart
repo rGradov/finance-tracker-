@@ -22,6 +22,7 @@ const List<String> IMAGES = [
   AppImages.onboardinListMoney,
   AppImages.onBoardingPlan,
 ];
+/// TODO: translate this part
 const List<String> SUBHEADERS = [
   'Track your transaction easily,with categories and financial report',
   'Track your transaction easily,with categories and financial report ',
