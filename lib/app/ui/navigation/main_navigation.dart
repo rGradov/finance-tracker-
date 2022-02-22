@@ -4,6 +4,7 @@ import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
 import 'package:finance_tracker/app/ui/view/added_new_account.dart';
 import 'package:finance_tracker/app/ui/view/auth/onboarding/onboarding_screen.dart';
+import 'package:finance_tracker/app/ui/view/main/home/home_screen.dart';
 import 'package:finance_tracker/app/ui/view/pin_screen.dart';
 import 'package:finance_tracker/app/ui/view/setup_account_screen.dart';
 import 'package:finance_tracker/main.dart';
@@ -15,6 +16,7 @@ abstract class AppRoutes {
   static const mainRoute = '/';
   static const setupAccountRoute = '/setup';
   static const addedNewAccount = '/setup/add';
+  static const homeRoute = '/home';
   static const loginRoute = '$AUTHPREFIX${AuthRouteNames.initialRoute}';
 }
 
@@ -41,7 +43,11 @@ class MainNavigation {
         authFlowRoute: _subRoute,
         title: _subRoute,
       );
-    } else {
+    } else if(settings.name == AppRoutes.homeRoute){
+      _screen = const HomeScreen();
+    }
+
+    else {
       throw Exception('Unknown route: ${settings.name}');
     }
     return _routeUtils.sharedAxisTransition(

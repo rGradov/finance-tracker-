@@ -7,6 +7,8 @@ import 'package:finance_tracker/app/utils/app_lattachment_link.dart';
 enum ExpenseType {
   income,
   expenses,
+  transfer,
+
 }
 /// its just for now, what need to made we can easily switch
 /// between global Currency

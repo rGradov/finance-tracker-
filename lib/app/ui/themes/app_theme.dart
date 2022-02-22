@@ -30,6 +30,13 @@ abstract class AppColor {
     75:Color(0xFF161719),
     100:Color(0xFF0D0E0F),
   });
+
+  static const MaterialColor green = MaterialColor(_base, <int,Color>{
+    100:Color(0xFF00A86B),
+  });
+  static const MaterialColor red = MaterialColor(_base, <int,Color>{
+    100:Color(0xFFFD3C4A),
+  });
   static const int _base = 0xFF00000;
   static const int _baseDark =0xFF0D0E0F;
   static const int _primary = 0xFF05A5FF;

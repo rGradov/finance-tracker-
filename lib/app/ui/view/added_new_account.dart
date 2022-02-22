@@ -1,4 +1,5 @@
 import 'package:finance_tracker/app/ui/navigation/main_navigation.dart';
+import 'package:finance_tracker/app/ui/navigation/navigation_service.dart';
 import 'package:finance_tracker/app/ui/shared/app_top_navigation.dart';
 import 'package:finance_tracker/app/ui/shared/fill_button.dart';
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
@@ -6,6 +7,8 @@ import 'package:finance_tracker/bloc/wallet/wallet_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../main.dart';
 
 /// Header == Navigation arrow? and Name
 ///
@@ -202,9 +205,10 @@ class _ContinueButton extends StatelessWidget {
     return AnimatedOpacity(
       opacity: true ? 1 : 0.5,
       duration: const Duration(milliseconds: 250),
-      child: const FillButton(
+      child:  FillButton(
         text: 'continue',
-        routeName: AppRoutes.addedNewAccount,
+        routeName: AppRoutes.homeRoute,
+        action: ()=> getIt<NavigationService>().mainNavigateTo(name: AppRoutes.homeRoute),
       ),
     );
   }
