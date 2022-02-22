@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+
+import 'package:finance_tracker/app/model/expense_model.dart' show CurrencyType;
 /// basic types for wallet
 enum WalletType {
   bank,
@@ -6,12 +8,6 @@ enum WalletType {
   wallet, // <-- not sure about it
 }
 
-/// this is a basic types for currency in app
-enum CurrencyType {
-  dollar,
-  ruble,
-  bellRuble,
-}
 
 class WalletModel extends Equatable {
   final String name;
