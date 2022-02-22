@@ -14,11 +14,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+/// @example TextFieldType.password
 enum TextFieldType { password, email, repeatPassword }
 
 /// @example [0,1,2,3,4,5] 0 - fist 1,2,3,4 - middle, 5 -last
 enum TextFieldPosition { first, last, middle }
 
+/// this is the main of Sing up screen
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -47,7 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final _height = MediaQuery.of(context).size.height;
-
+    final _orientation = MediaQuery.of(context).orientation;
     /// REFACTOR THIS PART
     return BlocProvider(
         create: (_) => SignUpCubit(UserRepo(), AuthRepository()),
@@ -64,11 +66,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    _orientation == Orientation.landscape?const SizedBox():
                     const Spacer(
                       flex: 1,
                     ),
+
                     Expanded(
-                        flex: 3,
+                        flex: _orientation == Orientation.landscape?4:3,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: _FormWrapper(
@@ -79,8 +83,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const Expanded(
                         flex: 3,
                         child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: _SignUpButtonsWrapper())),
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: _SignUpButtonsWrapper(),
+                        )),
+                    _orientation == Orientation.landscape?const SizedBox():
                     const Spacer(
                       flex: 3,
                     ),
@@ -285,12 +291,19 @@ class _PrivacyPoliceWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _orientation = MediaQuery.of(context).orientation;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: Row(
-        children: const [
-          _CheckBox(),
-          Expanded(child: _PrivacyText()),
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children:  [
+          Expanded(
+              flex: _orientation == Orientation.landscape?2:0,
+              child:const  _CheckBox()),
+          Expanded(
+              flex: _orientation == Orientation.landscape?8:3,
+              child: const _PrivacyText()),
 
           /// TODO: added text
           /// TODO: added link
@@ -370,16 +383,49 @@ class _SignUpButtonsWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _orientation = MediaQuery.of(context).orientation;
+    if (_orientation != Orientation.landscape) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: const [
+          _SignUpButton(),
+          _OrWith(),
+          _SignUpGoogleButton(),
+          _AlreadyHaveAccountWrapper(),
+        ],
+      );
+    } else {
+      return const _LandscapeButtonsWrapper();
+    }
+  }
+}
+
+class _LandscapeButtonsWrapper extends StatelessWidget {
+  const _LandscapeButtonsWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [
-        _SignUpButton(),
-        _OrWith(),
-        _SignUpGoogleButton(),
-        _AlreadyHaveAccountWrapper(),
+      children: [
+        FractionallySizedBox(
+          widthFactor: 0.8,
+          alignment: Alignment.center,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: const [
+              Expanded(flex: 3, child: _SignUpButton()),
+              Expanded(
+                child: Center(child: _OrWith()),
+              ),
+              Expanded(flex: 3, child: _SignUpGoogleButton()),
+            ],
+          ),
+        ),
+        const Expanded(child: _AlreadyHaveAccountWrapper()),
       ],
     );
+    ;
   }
 }
 
@@ -393,6 +439,7 @@ class _SignUpButton extends StatelessWidget {
       opacity: 1,
       duration: const Duration(milliseconds: 300),
       child: FillButton(
+        alignment: MainAxisAlignment.center,
         needPadding: false,
         action: () => getIt<NavigationService>()
             .mainNavigateTo(name: AppRoutes.setupAccountRoute),
@@ -489,16 +536,19 @@ class _SignUpGoogleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _orientation = MediaQuery.of(context).orientation;
     final _style = TextStyle(
       color: AppColor.baseDark[50],
       fontSize: 18,
       fontFamily: 'Inter',
       fontWeight: FontWeight.w600,
     );
+
+    /// FIXME: REFACTOR ME
     return Container(
         constraints: const BoxConstraints(maxHeight: 80, minHeight: 60),
         padding: const EdgeInsets.symmetric(vertical: 14),
-        width: double.infinity,
+        width: _orientation == Orientation.landscape ? 300 : double.infinity,
         decoration: BoxDecoration(
           color: Colors.transparent,
           border: Border.all(color: AppColor.baseLight[60]!),
@@ -508,7 +558,7 @@ class _SignUpGoogleButton extends StatelessWidget {
         ),
         child: FractionallySizedBox(
           alignment: Alignment.center,
-          widthFactor: 0.6,
+          widthFactor: _orientation == Orientation.landscape ? 0.8 : 0.6,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

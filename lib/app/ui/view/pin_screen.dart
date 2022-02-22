@@ -31,11 +31,6 @@ class PinScreen extends StatelessWidget {
         ),
       ),
     );
-    // return BlocProvider(
-    //   create: (_) => UserPinCubit(UserRepo()),
-    //   lazy: false,
-    //   child: ,
-    // );
   }
 }
 

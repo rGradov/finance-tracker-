@@ -1,7 +1,7 @@
 import 'package:finance_tracker/app/model/wallet_model.dart';
 
 class WalletRepository {
-  var _wallet = WalletModel('', WalletType.wallet, 0, CurrencyType.dollar);
+  var _wallet = const WalletModel('', WalletType.wallet, 0, CurrencyType.dollar);
 
   void setWalletName(String name) {
     _wallet = _wallet.copyWith(name: name);

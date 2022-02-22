@@ -9,12 +9,14 @@ class FillButton extends StatefulWidget {
   final Color? color;
   final Color? textColor;
   final void Function()? action;
+  final MainAxisAlignment alignment;
 
   const FillButton(
       {Key? key,
       this.action,
       this.textColor,
       this.color,
+        this.alignment = MainAxisAlignment.end,
       required this.text,
       required this.routeName,
       this.needPadding = true})
@@ -37,7 +39,7 @@ class _FillButtonState extends State<FillButton> {
     return GestureDetector(
       onTap: widget.action,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: widget.alignment,
         children: [
           Container(
             constraints: const BoxConstraints(maxHeight: 60),

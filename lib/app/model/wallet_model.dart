@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
-
+/// basic types for wallet
 enum WalletType {
   bank,
   card,
   wallet, // <-- not sure about it
 }
+
+/// this is a basic types for currency in app
 enum CurrencyType {
   dollar,
   ruble,
