@@ -1,11 +1,15 @@
 import 'package:finance_tracker/app/ui/themes/app_theme.dart';
+import 'package:finance_tracker/app/ui/view/main/home/expenses_income/bloc/expenses/expenses_bloc.dart';
 import 'package:finance_tracker/resources/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum ExpensesIncomeType {
   expenses,
   income,
 }
+
+const DURATION = Duration(milliseconds: 300);
 
 class ExpensesIncome extends StatelessWidget {
   const ExpensesIncome({Key? key}) : super(key: key);
@@ -19,26 +23,29 @@ class _ExpensesIncomeWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      widthFactor: 0.9,
-      alignment: Alignment.center,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Expanded(
-            child: _ExpensesIncomeBodyWrapper(
-              type: ExpensesIncomeType.income,
+    return BlocProvider(
+      create: (_) => ExpensesCubit(),
+      child: FractionallySizedBox(
+        widthFactor: 0.9,
+        alignment: Alignment.center,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            Expanded(
+              child: _ExpensesIncomeBodyWrapper(
+                type: ExpensesIncomeType.income,
+              ),
             ),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Expanded(
-            child: _ExpensesIncomeBodyWrapper(
-              type: ExpensesIncomeType.expenses,
+            SizedBox(
+              width: 20,
             ),
-          ),
-        ],
+            Expanded(
+              child: _ExpensesIncomeBodyWrapper(
+                type: ExpensesIncomeType.expenses,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -98,8 +105,11 @@ class _ExpensesIncomesAnimationBodyState
           const SizedBox(
             width: 10,
           ),
-          _TextWrapper(
-            type: widget.type,
+          FractionallySizedBox(
+            heightFactor: 0.6,
+            child: _TextWrapper(
+              type: widget.type,
+            ),
           ),
 
           /// TODO: added text and value
@@ -133,10 +143,18 @@ class _IconWrapper extends StatelessWidget {
 }
 
 /// use type just for displayed text [Income] or [Expenses]
-class _TextWrapper extends StatelessWidget {
+class _TextWrapper extends StatefulWidget {
   final ExpensesIncomeType type;
 
   const _TextWrapper({Key? key, required this.type}) : super(key: key);
+
+  @override
+  State<_TextWrapper> createState() => _TextWrapperState();
+}
+
+class _TextWrapperState extends State<_TextWrapper> {
+  bool _isLoaded = false;
+  String? value;
 
   @override
   Widget build(BuildContext context) {
@@ -145,31 +163,58 @@ class _TextWrapper extends StatelessWidget {
         fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
         fontSize: 18);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        type == ExpensesIncomeType.expenses
-            ? Text(
-                'Expenses',
-                style: _style,
-              )
-            : Text(
-                'Income',
-                style: _style,
+    return BlocConsumer<ExpensesCubit, ExpensesState>(builder: (_, __) {
+      return Stack(
+        children: [
+          widget.type == ExpensesIncomeType.expenses
+
+              /// TODO: REFACTOR THIS
+              ? AnimatedAlign(
+                  curve: Curves.easeIn,
+                  duration: DURATION,
+                  alignment: _isLoaded ? Alignment.topCenter : Alignment.center,
+                  child: Text(
+                    'income',
+                    style: _style,
+                  ),
+                )
+              : AnimatedAlign(
+                  curve: Curves.easeIn,
+                  duration: DURATION,
+                  alignment: _isLoaded ? Alignment.topCenter : Alignment.center,
+                  child: Text(
+                    'Expenses',
+                    style: _style,
+                  ),
+                ),
+
+          /// TODO: REFACTOR THIS
+          Offstage(
+            offstage: !_isLoaded,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: _ValueWrapper(
+                type: widget.type,
+                value: value,
               ),
-        _ValueWrapper(
-          type: type,
-          value: 'BYN10',
-        ),
-      ],
-    );
+            ),
+          ),
+        ],
+      );
+    }, listener: (_, state) {
+      if (state is ExpensesLoaded) {
+        setState(() {
+          _isLoaded = true;
+          value = state.accountBalance;
+        });
+      }
+    });
   }
 }
 
 class _ValueWrapper extends StatefulWidget {
   final ExpensesIncomeType type;
-  final String value;
+  final String? value;
 
   const _ValueWrapper({Key? key, required this.type, required this.value})
       : super(key: key);
@@ -185,16 +230,21 @@ class _ValueWrapperState extends State<_ValueWrapper>
 
   @override
   void initState() {
-    widget.value.split('').forEach((char) {
-      _animationControllers.add(
-          AnimationController(vsync: this, duration: const Duration(seconds: 1))
-            ..addListener(_animationListener));
-    });
-    for (var controller in _animationControllers) {
-      _animations.add(Tween<double>(begin: 0, end: 1).animate(controller));
-    }
-    _animationControllers.first.forward();
     super.initState();
+  }
+
+  void _initAnimation() {
+    if (widget.value != null) {
+      widget.value!.split('').forEach((char) {
+        _animationControllers.add(
+            AnimationController(vsync: this, duration: DURATION)
+              ..addListener(_animationListener));
+      });
+      for (var controller in _animationControllers) {
+        _animations.add(Tween<double>(begin: 0, end: 1).animate(controller));
+      }
+      _animationControllers.first.forward();
+    }
   }
 
   void _animationListener() {
@@ -206,6 +256,14 @@ class _ValueWrapperState extends State<_ValueWrapper>
         }
       }
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant _ValueWrapper oldWidget) {
+    if (oldWidget.value != widget.value && widget.value != null) {
+      _initAnimation();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -223,23 +281,30 @@ class _ValueWrapperState extends State<_ValueWrapper>
         fontFamily: 'Inter',
         fontWeight: FontWeight.w700,
         fontSize: 22);
-    return Row(
-        children: widget.value
-            .split('')
-            .asMap()
-            .map<int, Widget>((idx, v) {
-              return MapEntry(
-                  idx,
-                  AnimatedBuilder(
-                    animation: _animations[idx],
-                    builder: (BuildContext context, Widget? child) {
-                      return Opacity(
-                          opacity: _animations[idx].value,
-                          child: Text(widget.value[idx].toString(),style: _style,));
-                    },
-                  ));
-            })
-            .values
-            .toList());
+    if (widget.value != null) {
+      return Row(
+          children: widget.value!
+              .split('')
+              .asMap()
+              .map<int, Widget>((idx, v) {
+                return MapEntry(
+                    idx,
+                    AnimatedBuilder(
+                      animation: _animations[idx],
+                      builder: (BuildContext context, Widget? child) {
+                        return Opacity(
+                            opacity: _animations[idx].value,
+                            child: Text(
+                              widget.value![idx].toString(),
+                              style: _style,
+                            ));
+                      },
+                    ));
+              })
+              .values
+              .toList());
+    } else {
+      return const SizedBox();
+    }
   }
 }

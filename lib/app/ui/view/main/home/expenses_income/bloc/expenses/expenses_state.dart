@@ -24,9 +24,10 @@ class ExpensesEmpty extends ExpensesState {
 
   @override
   List<Object?> get props => [
-    currency,
-  ];
+        currency,
+      ];
 }
+
 /// when account balance was loaded
 class ExpensesLoaded extends ExpensesState {
   const ExpensesLoaded({required this.currency, required this.value});
@@ -36,7 +37,8 @@ class ExpensesLoaded extends ExpensesState {
   final double value;
 
   /// use if for show account balance
-  String get accountBalance => value.toString() + currency.toString();
+  String get accountBalance =>
+      CurrencyConverter(currency).value.toString() + value.toString();
 
   @override
   List<Object?> get props => [currency, value];
