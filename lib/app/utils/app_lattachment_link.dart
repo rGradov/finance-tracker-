@@ -14,7 +14,7 @@ class AttachmentsLink extends Equatable {
 
   const AttachmentsLink(this.url, this.localPath);
 
-  String? get link => url ?? localPath;
+  String? get link => url;
 
   AttachmentsFile get getType => _checkAttachment();
 

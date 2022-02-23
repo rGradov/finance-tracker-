@@ -32,11 +32,12 @@ class AccountBalanceLoaded extends AccountBalanceState {
   const AccountBalanceLoaded({required this.currency, required this.value});
 
   /// displayed current currency
+  /// made currency private
   final CurrencyType currency;
   final double value;
 
   /// use if for show account balance
-  String get accountBalance => value.toString() + currency.toString();
+  String get accountBalance => CurrencyConverter(currency).value.toString() + value.toString();
 
   @override
   List<Object?> get props => [currency, value];
